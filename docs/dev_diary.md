@@ -1,6 +1,6 @@
 # Journal de développement
 
-## 2026-03-22 12:00:00 UTC
+## 2026-03-22 23:00:00 UTC
 
 ### Feature : 12_release_readiness
 
@@ -22,7 +22,7 @@
 
 ---
 
-## 2025-03-22 22:30:00 UTC
+## 2026-03-22 22:30:00 UTC
 
 ### Feature : 11_test_quality_and_ci_hardening
 
@@ -43,7 +43,7 @@
 
 ---
 
-## 2025-03-22 21:00:00 UTC
+## 2026-03-22 21:00:00 UTC
 
 ### Feature : 10_public_facade_and_examples
 
@@ -63,7 +63,7 @@
 
 ---
 
-## 2025-03-22 20:45:00 UTC
+## 2026-03-22 20:45:00 UTC
 
 ### Feature : 09_decode_backend_integration
 
@@ -83,7 +83,7 @@
 
 ---
 
-## 2025-03-22 20:30:00 UTC
+## 2026-03-22 20:30:00 UTC
 
 ### Feature : 08_reader_ports_and_core_service
 
@@ -102,7 +102,7 @@
 
 ---
 
-## 2025-03-22 20:15:00 UTC
+## 2026-03-22 20:15:00 UTC
 
 ### Feature : 07_qrcode_generation_backend
 
@@ -122,7 +122,7 @@
 
 ---
 
-## 2025-03-22 19:45:00 UTC
+## 2026-03-22 19:45:00 UTC
 
 ### Feature : 06_code128_generation_backend
 
@@ -142,7 +142,7 @@
 
 ---
 
-## 2025-03-22 19:40:00 UTC
+## 2026-03-22 19:40:00 UTC
 
 ### Feature : 05_generation_ports_and_core_service
 
@@ -162,7 +162,7 @@
 
 ---
 
-## 2025-03-22 19:35:00 UTC
+## 2026-03-22 19:35:00 UTC
 
 ### Feature : 04_payload_validation_service
 
@@ -182,7 +182,7 @@
 
 ---
 
-## 2025-03-22 19:30:00 UTC
+## 2026-03-22 19:30:00 UTC
 
 ### Feature : 03_exceptions_hierarchy
 
@@ -202,7 +202,7 @@
 
 ---
 
-## 2025-03-22 19:20:00 UTC
+## 2026-03-22 19:20:00 UTC
 
 ### Feature : 02_domain_models_and_enums
 
@@ -223,14 +223,24 @@
 
 ---
 
-## 2025-03-22
+## 2026-03-22 09:00:00 UTC
 
 ### Feature : 01_project_bootstrap
 
-### Résumé des actions
+### Modifications
 
 - Mise en place de l’arborescence `src/baobab_barcode/` (api, domain, application, infrastructure, exceptions) avec marqueur `py.typed`.
 - Ajout de `pyproject.toml` (setuptools, métadonnées, extras `dev`, configuration centralisée de black, pytest, mypy, pylint, bandit).
 - Fichiers racine : `README.md`, `LICENSE` (MIT), `.gitignore`.
 - Tests : `tests/test_smoke.py` pour valider l’import du package.
 - Objectif : base installable (`pip install -e .`), testable et alignée sur les contraintes de qualité (mypy strict, ligne 100 caractères).
+
+### Buts
+
+- Poser un socle de projet installable, testable et documenté pour les features suivantes.
+
+### Impact
+
+- Démarrage homogène pour le développement itératif sur le domaine et les couches applicatives.
+
+---

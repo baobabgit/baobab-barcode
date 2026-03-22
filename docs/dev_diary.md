@@ -1,5 +1,25 @@
 # Journal de développement
 
+## 2025-03-22 19:40:00 UTC
+
+### Feature : 05_generation_ports_and_core_service
+
+### Modifications
+
+- Port `BarcodeGenerator` (`Protocol`), `BarcodeGeneratorRegistry`, `BarcodeGenerationService` (validation → routage → `GeneratedBarcode`).
+- Exceptions projet : `InvalidBarcodeValueException`, `UnsupportedBarcodeFormatException` pour les échecs de génération côté service.
+- Tests avec doubles factices et documentation (README architecture, changelog, journal).
+
+### Buts
+
+- Définir le cœur applicatif de génération sans dépendre d’un backend concret, pour brancher ensuite des adaptateurs infrastructure.
+
+### Impact
+
+- Les intégrations pourront enregistrer des implémentations par format tout en réutilisant la validation et le modèle de domaine.
+
+---
+
 ## 2025-03-22 19:35:00 UTC
 
 ### Feature : 04_payload_validation_service

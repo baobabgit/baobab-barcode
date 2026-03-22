@@ -1,5 +1,25 @@
 # Journal de développement
 
+## 2025-03-22 19:35:00 UTC
+
+### Feature : 04_payload_validation_service
+
+### Modifications
+
+- Ajout de `PayloadValidationService.validate_payload`, `PayloadNormalizationService`, validateurs par format (CODE128 ASCII imprimable, QR Unicode), helper partagé pour l’échec « chaîne vide après trim ».
+- Registre injectable pour tests et extensions ; export du sous-package `application` depuis `baobab_barcode`.
+- Tests unitaires (cas valides / invalides, trim, Unicode, vide, format non enregistré) et documentation (README, changelog, journal).
+
+### Buts
+
+- Centraliser la validation et la normalisation des charges selon la symbologie, avec résultats explicites et logique extensible.
+
+### Impact
+
+- Les couches applicatives et les futurs backends peuvent s’appuyer sur des règles communes et documentées.
+
+---
+
 ## 2025-03-22 19:30:00 UTC
 
 ### Feature : 03_exceptions_hierarchy

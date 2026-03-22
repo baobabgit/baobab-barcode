@@ -1,0 +1,1 @@
+"""Adaptateurs et intégrations techniques."""

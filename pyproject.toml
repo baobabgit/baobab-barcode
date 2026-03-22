@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "baobab-barcode"
+version = "0.1.0"
+description = "Bibliothèque Python pour la génération et la lecture de codes-barres."
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [{ name = "Baobab Barcode contributors" }]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+baobab_barcode = ["py.typed"]

@@ -109,6 +109,28 @@ svc = application.BarcodeGenerationService(
 )
 ```
 
+### Exemple — génération CODE128 en PNG
+
+Avec le backend infrastructure (python-barcode + Pillow), enregistrez le registre par défaut ou le générateur seul :
+
+```python
+from baobab_barcode import application, domain, infrastructure
+
+opts = domain.BarcodeGenerationOptions(
+    barcode_format=domain.BarcodeFormat.CODE128,
+    width=280,
+    height=120,
+    image_format="png",
+    include_text=True,
+)
+service = application.BarcodeGenerationService(
+    generator_registry=infrastructure.create_default_barcode_generator_registry(),
+)
+generated = service.generate("ART-12345", opts)
+assert generated.mime_type == "image/png"
+# generated.content : octets PNG
+```
+
 ## Development
 
 - Python 3.11 ou supérieur

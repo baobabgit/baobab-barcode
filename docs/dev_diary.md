@@ -1,5 +1,25 @@
 # Journal de développement
 
+## 2025-03-22 19:45:00 UTC
+
+### Feature : 06_code128_generation_backend
+
+### Modifications
+
+- Backend `Code128PngBarcodeGenerator` (PNG, MIME `image/png`, extension `png`) encapsulant `python-barcode` et Pillow, sans exposition de types tiers dans l’API publique.
+- `create_default_barcode_generator_registry` pour brancher CODE128 sur le service cœur ; `baobab_barcode.infrastructure` exporté.
+- Dépendances de production : `python-barcode` (symbologie, writers) et `Pillow` (rasterisation) avec contraintes de version dans `pyproject.toml`.
+
+### Buts
+
+- Fournir une génération réelle interchangeable tout en gardant le domaine et les ports stables.
+
+### Impact
+
+- Les utilisateurs peuvent produire des PNG CODE128 valides sans coupler leur code aux bibliothèques tierces.
+
+---
+
 ## 2025-03-22 19:40:00 UTC
 
 ### Feature : 05_generation_ports_and_core_service

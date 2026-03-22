@@ -1,5 +1,26 @@
 # Journal de développement
 
+## 2025-03-22 22:30:00 UTC
+
+### Feature : 11_test_quality_and_ci_hardening
+
+### Modifications
+
+- `pyproject.toml` : rapports coverage HTML/XML vers `docs/tests/coverage`, précision des rapports, `pythonpath` pytest `["src", "."]` pour importer les helpers sous `tests/`.
+- Tests : une classe `Test*` par fichier pour les modules qui en regroupaient plusieurs ; helpers `code128_generation_test_helpers`, `qrcode_generation_test_helpers`, `png_zbar_read_test_helpers` ; tests QR supplémentaires (palette, RVB natif) pour couverture branches complète.
+- `qrcode_png_barcode_generator` : branches `_box_size_for_options` et `_resize_to_options` clarifiées (plus de chemins impossibles).
+- `.gitignore`, `docs/tests/coverage/README.md`, `Makefile` (`make quality`), README (développement, quality gates).
+
+### Buts
+
+- Durcir la validation locale et CI : outils centralisés, couverture ≥ 90 % (atteint 100 % sur le paquet source), rapports coverage localisés et hors Git.
+
+### Impact
+
+- Les contributeurs disposent d’une check-list claire et de commandes reproductibles sans dépendance réseau une fois l’environnement installé.
+
+---
+
 ## 2025-03-22 21:00:00 UTC
 
 ### Feature : 10_public_facade_and_examples

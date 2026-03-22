@@ -50,16 +50,15 @@ Le décodage par défaut repose sur **pyzbar**, qui utilise la bibliothèque nat
 
 ## Utilisation rapide (façade publique)
 
-Les fonctions suivantes sont exposées sur le package racine et listées dans `baobab_barcode.__all__` :
+Le contrat stable du package racine est défini par `baobab_barcode.__all__` : `__version__` et les quatre fonctions ci-dessous. Les sous-packages (`api`, `domain`, `application`, `exceptions`, `infrastructure`) ne sont pas réexportés sur le namespace racine mais restent importables explicitement (par ex. `from baobab_barcode import domain`, `import baobab_barcode.api`).
 
-| Fonction | Rôle |
-|----------|------|
+| Symbole | Rôle |
+|---------|------|
+| `__version__` | Numéro de version du paquet (aligné sur `pyproject.toml`). |
 | `validate_payload(payload, barcode_format)` | Valide une charge pour une symbologie. |
 | `generate(...)` | Génère une image (backends par défaut). |
 | `decode_from_bytes(...)` | Décode depuis un tampon d’octets. |
 | `decode_from_file(...)` | Décode depuis un chemin de fichier. |
-
-La version exposée côté code est disponible via `baobab_barcode.__version__` (alignée sur la version du paquet dans `pyproject.toml`).
 
 ```python
 import baobab_barcode
@@ -121,7 +120,7 @@ out = baobab_barcode.decode_from_file(
 
 ## Modèles de domaine et API avancée
 
-Les types du domaine (`BarcodeFormat`, `BarcodeGenerationOptions`, `DecodeResult`, etc.) sont exposés via `baobab_barcode.domain`. Les couches `application` et `infrastructure` restent accessibles pour un branchement personnalisé (registres, protocoles, backends).
+Les types du domaine (`BarcodeFormat`, `BarcodeGenerationOptions`, `DecodeResult`, etc.) sont disponibles dans le sous-package `baobab_barcode.domain` (import explicite). Les couches `application` et `infrastructure` suivent le même principe pour un branchement personnalisé (registres, protocoles, backends).
 
 ```python
 from baobab_barcode import domain

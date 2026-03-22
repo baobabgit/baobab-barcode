@@ -7,6 +7,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Package racine** : `__all__` et chargement du `__init__` limités à `__version__` et aux quatre fonctions de façade (`generate`, `validate_payload`, `decode_from_bytes`, `decode_from_file`). Les sous-packages `api`, `application`, `domain`, `exceptions` et `infrastructure` ne sont plus importés à l’import du package racine ; ils restent accessibles par import explicite (`from baobab_barcode import domain`, `import baobab_barcode.api`, attributs de module après import du sous-package, etc.).
+
 ## [0.1.0] — 2026-03-22
 
 ### Added

@@ -82,7 +82,9 @@ class BarcodeReadService:
         reader = self._registry.resolve(opts.expected_format)
         if reader is None:
             raise UnsupportedBarcodeFormatException(
-                f"Aucun décodeur n'est enregistré pour le format : {opts.expected_format!s}."
+                f"Aucun décodeur n'est enregistré pour le format : {opts.expected_format!s}. "
+                "Pour le décodage PNG par défaut (pyzbar / zbar), installez l'extra [decode] "
+                "et, sur votre plateforme, la bibliothèque système zbar si nécessaire."
             )
         return reader.decode_from_bytes(content, opts)
 

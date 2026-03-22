@@ -2,18 +2,28 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from io import BytesIO
-from typing import Final
+from typing import Any, Final
 
 from PIL import Image, UnidentifiedImageError
-from pyzbar.pyzbar import Decoded, decode as zbar_decode
 
 from baobab_barcode.domain.enums.barcode_format import BarcodeFormat
 from baobab_barcode.domain.results.decode_result import DecodeResult
 from baobab_barcode.domain.value_objects.barcode_read_options import BarcodeReadOptions
 from baobab_barcode.exceptions.barcode_decoding_exception import BarcodeDecodingException
 
+try:
+    from pyzbar.pyzbar import decode as zbar_decode
+except ImportError:
+    zbar_decode = None
+
 _PNG_MAGIC: Final[bytes] = b"\x89PNG\r\n\x1a\n"
+
+
+def is_decode_backend_available() -> bool:
+    """Indique si le module *pyzbar* est importable (extra ``[decode]`` installé)."""
+    return zbar_decode is not None
 
 
 def _pyzbar_type_to_format(raw: object) -> BarcodeFormat | None:
@@ -37,7 +47,11 @@ class PngZbarBarcodeReader:
 
     - Entrée **PNG** uniquement (signature et décodage raster) ; autres formats
       renvoient un échec structuré sans exception systématique.
-    - Dépend de la bibliothèque **zbar** (fournie avec *pyzbar* selon la plateforme).
+    - Sans l'extra ``[decode]`` (paquet *pyzbar*), :meth:`decode_from_bytes` renvoie
+      un :class:`~baobab_barcode.domain.results.decode_result.DecodeResult` avec
+      ``success=False`` ; le registre par défaut n'enregistre alors aucun décodeur.
+    - Avec *pyzbar*, la bibliothèque native **zbar** peut être requise selon la
+      plateforme (voir la documentation de pyzbar).
     - Symbologies limitées à ce que zbar expose ici : ``CODE128`` et ``QRCODE``.
     - Image illisible (fichier corrompu) : :class:`BarcodeDecodingException`.
     - Absence de symbole détecté ou mauvais type par rapport à ``expected_format`` :
@@ -51,6 +65,8 @@ class PngZbarBarcodeReader:
         if expected is None:
             return DecodeResult(success=False, payload=None, barcode_format=None)
         if not content.startswith(_PNG_MAGIC):
+            return DecodeResult(success=False, payload=None, barcode_format=None)
+        if zbar_decode is None:
             return DecodeResult(success=False, payload=None, barcode_format=None)
         try:
             with Image.open(BytesIO(content)) as img:
@@ -66,7 +82,7 @@ class PngZbarBarcodeReader:
 
     def _select_result(
         self,
-        decoded: list[Decoded],
+        decoded: Sequence[Any],
         expected: BarcodeFormat,
     ) -> DecodeResult:
         """Choisit le premier symbole compatible avec le format attendu."""

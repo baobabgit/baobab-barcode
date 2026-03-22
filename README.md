@@ -14,7 +14,7 @@ Bibliothèque Python pour **valider**, **générer** et **décoder** des codes-b
 
 - **Validation** de charges utiles par symbologie (résultats explicites, sans exception pour les cas courants).
 - **Génération** d’images PNG via des backends par défaut (python-barcode, qrcode, Pillow).
-- **Lecture** d’images PNG via un décodeur par défaut (pyzbar / zbar), compatible avec les PNG produits par la librairie.
+- **Lecture** d’images PNG via un décodeur par défaut (*pyzbar* / zbar), activable par l’extra ``[decode]``, compatible avec les PNG produits par la librairie.
 
 Les erreurs prévues héritent de `baobab_barcode.exceptions.BaobabBarcodeException` et peuvent être filtrées finement ou interceptées globalement.
 
@@ -25,6 +25,14 @@ Les erreurs prévues héritent de `baobab_barcode.exceptions.BaobabBarcodeExcept
 ```bash
 pip install baobab-barcode
 ```
+
+Pour activer le **décodage** PNG (CODE128 / QR Code) avec le backend par défaut, installez aussi l’extra :
+
+```bash
+pip install baobab-barcode[decode]
+```
+
+Sans cet extra, la génération et la validation restent disponibles ; les appels à `decode_from_bytes` / `decode_from_file` via la façade lèvent `UnsupportedBarcodeFormatException` (aucun décodeur enregistré pour le format demandé), sauf si vous fournissez un registre personnalisé.
 
 Les métadonnées du projet (dépendances, classifiers, liens) sont définies dans [`pyproject.toml`](pyproject.toml).
 
@@ -42,11 +50,13 @@ Pour le développement (tests et outils de qualité) :
 pip install -e ".[dev]"
 ```
 
+L’extra de développement inclut **pyzbar** (comme l’extra `[decode]`) afin que les tests et le décodage local fonctionnent sans étape supplémentaire.
+
 **Prérequis** : Python **3.11** ou supérieur.
 
 ### Prérequis système (décodage)
 
-Le décodage par défaut repose sur **pyzbar**, qui utilise la bibliothèque native **zbar**. Sur votre plateforme, installez le paquet système ou binaire **zbar** attendu par pyzbar (voir la documentation de [pyzbar](https://github.com/NaturalHistoryMuseum/pyzbar)).
+Avec l’extra `[decode]`, le décodage par défaut repose sur **pyzbar**, qui s’appuie sur la bibliothèque native **zbar**. Sur votre plateforme, installez le paquet système ou binaire **zbar** attendu par pyzbar (voir la documentation de [pyzbar](https://github.com/NaturalHistoryMuseum/pyzbar)).
 
 ## Utilisation rapide (façade publique)
 
@@ -165,7 +175,8 @@ Les messages par défaut sont exposés sur chaque classe via l’attribut `DEFAU
 ### Limites du décodage PNG par défaut
 
 - Entrées **PNG** ; autre format → `DecodeResult` d’échec sans exception systématique.
-- Dépendance native **zbar** (paquet **pyzbar**).
+- Extra ``decode`` (``pip install baobab-barcode[decode]``) : installe le paquet **pyzbar** ; une bibliothèque native **zbar** peut encore être requise selon l’OS.
+- Sans **pyzbar**, `is_decode_backend_available()` renvoie `False` et le registre par défaut ne contient aucun décodeur (voir section Installation).
 - Pour le QR, le texte est lu en **UTF-8** ; des écarts peuvent exister selon les modes d’encodage du générateur (préférer l’ASCII pour des tests déterministes).
 
 ## Développement

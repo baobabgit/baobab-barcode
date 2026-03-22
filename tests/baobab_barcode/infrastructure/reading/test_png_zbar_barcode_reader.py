@@ -16,7 +16,11 @@ from baobab_barcode.domain.enums.barcode_format import BarcodeFormat
 from baobab_barcode.domain.results.decode_result import DecodeResult
 from baobab_barcode.domain.value_objects.barcode_read_options import BarcodeReadOptions
 from baobab_barcode.exceptions.barcode_decoding_exception import BarcodeDecodingException
-from baobab_barcode.infrastructure.reading.png_zbar_barcode_reader import PngZbarBarcodeReader
+from baobab_barcode.infrastructure.reading import png_zbar_barcode_reader as png_zbar_mod
+from baobab_barcode.infrastructure.reading.png_zbar_barcode_reader import (
+    PngZbarBarcodeReader,
+    is_decode_backend_available,
+)
 from tests.baobab_barcode.infrastructure.reading.png_zbar_read_test_helpers import (
     zbar_gen_opts,
     zbar_read_opts,
@@ -25,6 +29,20 @@ from tests.baobab_barcode.infrastructure.reading.png_zbar_read_test_helpers impo
 
 class TestPngZbarBarcodeReader:
     """Comportement unitaire du backend."""
+
+    def test_is_decode_backend_available_matches_import(self) -> None:
+        """Le indicateur reflète la présence de *pyzbar* (extra ``[decode]``)."""
+        zbar = getattr(png_zbar_mod, "zbar_decode", None)
+        assert is_decode_backend_available() is (zbar is not None)
+
+    def test_decode_fails_when_zbar_unavailable(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Sans moteur zbar : échec structuré (PNG valide)."""
+        monkeypatch.setattr(png_zbar_mod, "zbar_decode", None)
+        buf = BytesIO()
+        Image.new("RGB", (32, 32), color="white").save(buf, format="PNG")
+        reader = png_zbar_mod.PngZbarBarcodeReader()
+        out = reader.decode_from_bytes(buf.getvalue(), zbar_read_opts(BarcodeFormat.CODE128))
+        assert out.success is False
 
     def test_decode_fails_on_non_png_bytes(self) -> None:
         """Contenu non PNG : échec structuré."""

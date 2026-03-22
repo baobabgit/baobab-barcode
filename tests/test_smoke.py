@@ -1,7 +1,7 @@
 """Test minimal d'import du package."""
 
 import baobab_barcode
-from baobab_barcode import application, domain, exceptions
+from baobab_barcode import application, domain, exceptions, infrastructure
 
 
 class TestSmokeImport:
@@ -48,3 +48,12 @@ class TestApplicationPublicExports:
         assert application.BarcodeGenerator is not None
         assert application.BarcodeGenerationService is not None
         assert application.BarcodeGeneratorRegistry is not None
+
+
+class TestInfrastructurePublicExports:
+    """Réexport du sous-package ``infrastructure``."""
+
+    def test_infrastructure_package_exports(self) -> None:
+        """Backends et fabrique de registre accessibles."""
+        assert infrastructure.Code128PngBarcodeGenerator is not None
+        assert infrastructure.create_default_barcode_generator_registry is not None

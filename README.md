@@ -1,6 +1,14 @@
 # baobab-barcode
 
-Bibliothèque Python pour la génération et la lecture de codes-barres (structure initiale, sans logique métier pour l’instant).
+Bibliothèque Python pour **valider**, **générer** et **décoder** des codes-barres (CODE128, QR Code) avec une API publique simple, tout en conservant une architecture **domaine / application / infrastructure** pour les intégrations avancées.
+
+## Description
+
+- **Validation** de charges utiles par symbologie (résultats explicites, sans exception pour les cas courants).
+- **Génération** d’images PNG via des backends par défaut (python-barcode, qrcode, Pillow).
+- **Lecture** d’images PNG via un décodeur par défaut (pyzbar / zbar), compatible avec les PNG produits par la librairie.
+
+Les erreurs prévues héritent de `baobab_barcode.exceptions.BaobabBarcodeException` et peuvent être filtrées finement ou interceptées globalement.
 
 ## Installation
 
@@ -16,24 +24,86 @@ Pour installer aussi les outils de développement :
 pip install -e ".[dev]"
 ```
 
-## Utilisation minimale
+**Prérequis** : Python **3.11** ou supérieur.
+
+## Utilisation rapide (façade publique)
+
+Les fonctions suivantes sont exposées directement sur le package `baobab_barcode` :
+
+| Fonction | Rôle |
+|----------|------|
+| `validate_payload(payload, barcode_format)` | Valide une charge pour une symbologie. |
+| `generate(...)` | Génère une image (backends par défaut). |
+| `decode_from_bytes(...)` | Décode depuis un tampon d’octets. |
+| `decode_from_file(...)` | Décode depuis un chemin de fichier. |
 
 ```python
 import baobab_barcode
+from baobab_barcode.domain.enums.barcode_format import BarcodeFormat
 
-print(baobab_barcode.__version__)
+check = baobab_barcode.validate_payload("  SKU-1  ", BarcodeFormat.CODE128)
+assert check.success and check.normalized_payload == "SKU-1"
+
+png = baobab_barcode.generate(
+    "SKU-1",
+    barcode_format=BarcodeFormat.CODE128,
+    width=280,
+    height=120,
+    image_format="png",
+    include_text=False,
+)
+assert png.mime_type == "image/png"
+
+result = baobab_barcode.decode_from_bytes(
+    png.content,
+    expected_format=BarcodeFormat.CODE128,
+)
+assert result.success and result.payload == "SKU-1"
 ```
 
-## Modèles de domaine
+Un script d’exemple est disponible dans le dossier [`examples/`](examples/) (`basic_usage.py`).
 
-Les types publics du domaine sont exposés via `baobab_barcode.domain` (également réexporté comme attribut `domain` du package racine) :
+## Exemples supplémentaires
+
+### Génération QR Code (PNG)
+
+```python
+import baobab_barcode
+from baobab_barcode.domain.enums.barcode_format import BarcodeFormat
+
+generated = baobab_barcode.generate(
+    "https://example.com/page",
+    barcode_format=BarcodeFormat.QR_CODE,
+    width=280,
+    height=280,
+    image_format="png",
+    include_text=False,
+)
+```
+
+### Décodage depuis un fichier
+
+```python
+from pathlib import Path
+
+import baobab_barcode
+from baobab_barcode.domain.enums.barcode_format import BarcodeFormat
+
+out = baobab_barcode.decode_from_file(
+    Path("capture.png"),
+    expected_format=BarcodeFormat.CODE128,
+)
+```
+
+## Modèles de domaine et API avancée
+
+Les types du domaine (`BarcodeFormat`, `BarcodeGenerationOptions`, `DecodeResult`, etc.) sont exposés via `baobab_barcode.domain`. Les couches `application` et `infrastructure` restent accessibles pour un branchement personnalisé (registres, protocoles, backends).
 
 ```python
 from baobab_barcode import domain
 
-fmt = domain.BarcodeFormat.CODE128
 opts = domain.BarcodeGenerationOptions(
-    barcode_format=fmt,
+    barcode_format=domain.BarcodeFormat.CODE128,
     width=200,
     height=80,
     image_format="png",
@@ -41,11 +111,9 @@ opts = domain.BarcodeGenerationOptions(
 )
 ```
 
-Voir aussi `CHANGELOG.md` pour le détail des ajouts récents.
+Voir `CHANGELOG.md` pour l’historique des ajouts.
 
 ## Erreurs
-
-Toutes les erreurs prévues par la librairie héritent de `baobab_barcode.exceptions.BaobabBarcodeException`. Vous pouvez les intercepter globalement ou par type spécialisé (valeur invalide, format non supporté, échec de rendu, de décodage ou de validation).
 
 ```python
 from baobab_barcode import exceptions
@@ -56,161 +124,43 @@ except exceptions.BaobabBarcodeException as exc:
     print(exc)
 ```
 
-Les messages par défaut sont exposés sur chaque classe via l'attribut de classe `DEFAULT_MESSAGE`.
+Les messages par défaut sont exposés sur chaque classe via l’attribut `DEFAULT_MESSAGE`.
 
 ## Validation des charges utiles
 
-Le service `baobab_barcode.application.PayloadValidationService` expose `validate_payload(payload, barcode_format)` et retourne un `domain.ValidationResult` (succès / échec explicite, sans exception pour les cas courants).
+| Format   | Non vide (après trim) | Contenu |
+|----------|------------------------|---------|
+| `CODE128` | obligatoire | caractères **ASCII imprimables** (U+0020 à U+007E) |
+| `QR_CODE` | obligatoire | **Unicode** autorisé (après trim) |
 
-Règles minimales actuelles :
+## Architecture (aperçu)
 
-| Format   | Non vide (après trim) | Bordures | Contenu |
-|----------|------------------------|----------|---------|
-| `CODE128` | obligatoire            | espaces de bord supprimés (`str.strip`) | uniquement caractères **ASCII imprimables** (U+0020 à U+007E) |
-| `QR_CODE` | obligatoire            | idem     | **Unicode** autorisé (tout point de code après trim) |
+1. **Génération** : port `BarcodeGenerator`, registre, `BarcodeGenerationService`.
+2. **Lecture** : port `BarcodeReader`, registre, `BarcodeReadService`.
+3. **Façade** : `baobab_barcode.generate`, `validate_payload`, `decode_*` s’appuient sur les services et registres par défaut sans exposer les détails d’infrastructure dans les signatures.
 
-Un format connu de l’enum mais absent du registre interne du service est signalé par un `ValidationResult` d’échec avec message explicite (aucune exception levée).
+### Limites du décodage PNG par défaut
 
-```python
-from baobab_barcode import application, domain
+- Entrées **PNG** ; autre format → `DecodeResult` d’échec sans exception systématique.
+- Dépendance native **zbar** (paquet **pyzbar**).
+- Pour le QR, le texte est lu en **UTF-8** ; des écarts peuvent exister selon les modes d’encodage du générateur (préférer l’ASCII pour des tests déterministes).
 
-svc = application.PayloadValidationService()
-result = svc.validate_payload("  HELLO  ", domain.BarcodeFormat.CODE128)
-assert result.success and result.normalized_payload == "HELLO"
-```
+## Développement et qualité
 
-## Architecture — génération
-
-La génération suit une séparation **port / adaptateurs** :
-
-1. **`application.BarcodeGenerator`** (`Protocol`) : contrat implémenté par les backends (rendu PNG, SVG, etc. dans la couche infrastructure).
-2. **`application.BarcodeGeneratorRegistry`** : associe chaque `BarcodeFormat` à une implémentation du port (enregistrement explicite, extensible).
-3. **`application.BarcodeGenerationService`** : valide la charge via `PayloadValidationService`, résout le bon générateur, appelle `generate(payload_normalisé, options)` et retourne un `GeneratedBarcode`.
-
-En cas de charge invalide après validation, **`InvalidBarcodeValueException`** est levée ; si aucun backend n’est enregistré pour le format, **`UnsupportedBarcodeFormatException`**.
-
-```python
-from baobab_barcode import application, domain
-
-def make_stub():
-    class Stub:
-        def generate(self, payload, options):
-            return domain.GeneratedBarcode(
-                payload=payload,
-                barcode_format=options.barcode_format,
-                content=b"stub",
-                mime_type="image/png",
-                file_extension="png",
-            )
-    return Stub()
-
-svc = application.BarcodeGenerationService(
-    generators_by_format={domain.BarcodeFormat.CODE128: make_stub()},
-)
-```
-
-### Exemple — génération CODE128 en PNG
-
-Avec le backend infrastructure (python-barcode + Pillow), enregistrez le registre par défaut ou le générateur seul :
-
-```python
-from baobab_barcode import application, domain, infrastructure
-
-opts = domain.BarcodeGenerationOptions(
-    barcode_format=domain.BarcodeFormat.CODE128,
-    width=280,
-    height=120,
-    image_format="png",
-    include_text=True,
-)
-service = application.BarcodeGenerationService(
-    generator_registry=infrastructure.create_default_barcode_generator_registry(),
-)
-generated = service.generate("ART-12345", opts)
-assert generated.mime_type == "image/png"
-# generated.content : octets PNG
-```
-
-### Exemple — génération QR Code en PNG
-
-```python
-from baobab_barcode import application, domain, infrastructure
-
-opts = domain.BarcodeGenerationOptions(
-    barcode_format=domain.BarcodeFormat.QR_CODE,
-    width=280,
-    height=280,
-    image_format="png",
-    include_text=False,
-)
-service = application.BarcodeGenerationService(
-    generator_registry=infrastructure.create_default_barcode_generator_registry(),
-)
-generated = service.generate("https://example.com/lien-unicode", opts)
-assert generated.mime_type == "image/png"
-# generated.content : octets PNG
-```
-
-## Architecture — lecture
-
-La lecture suit la même séparation **port / adaptateurs** que la génération :
-
-1. **`application.BarcodeReader`** (`Protocol`) : contrat des décodeurs (image, flux binaire, etc. dans la couche infrastructure).
-2. **`application.BarcodeReaderRegistry`** : associe chaque `BarcodeFormat` à une implémentation du port.
-3. **`application.BarcodeReadService`** : expose `decode_from_file` et `decode_from_bytes`, résout le décodeur selon `BarcodeReadOptions.expected_format`, retourne un `DecodeResult`.
-
-Les octets vides produisent un `DecodeResult` d’échec sans appeler le backend. Un fichier absent lève **`FileNotFoundError`**. Une erreur de lecture (permissions, etc.) est encapsulée dans **`BarcodeDecodingException`**. Si aucun décodeur n’est enregistré pour le format demandé, **`UnsupportedBarcodeFormatException`**.
-
-```python
-from baobab_barcode import application, domain
-
-class FakeReader:
-    def decode_from_bytes(self, content: bytes, options: domain.BarcodeReadOptions):
-        return domain.DecodeResult(
-            success=True,
-            payload=content.decode("ascii", errors="replace"),
-            barcode_format=options.expected_format,
-        )
-
-service = application.BarcodeReadService(
-    readers_by_format={domain.BarcodeFormat.QR_CODE: FakeReader()},
-)
-opts = domain.BarcodeReadOptions(expected_format=domain.BarcodeFormat.QR_CODE)
-assert service.decode_from_bytes(b"demo", opts).success is True
-# service.decode_from_file(Path("capture.png"), opts) lit le fichier puis délègue au même chemin
-```
-
-### Décodeur PNG par défaut (pyzbar / zbar)
-
-`infrastructure.PngZbarBarcodeReader` et `infrastructure.create_default_barcode_reader_registry()` ciblent les PNG **CODE128** et **QR_CODE** produits par les générateurs par défaut (même bibliothèque, flux binaire PNG).
-
-**Limites utiles à connaître**
-
-- Ce backend accepte des entrées **PNG** (signature et ouverture Pillow) ; tout autre format renvoie un `DecodeResult` d’échec sans lever d’exception.
-- La couche native **zbar** (paquet **pyzbar**) doit être disponible sur la machine (binaires fournis ou installés selon l’OS).
-- Pour le **QR Code**, le texte décodé est interprété en **UTF-8**. Selon la façon dont le générateur encode la charge (modes mixtes, kanji, etc.), une comparaison octet à octet avec la chaîne d’origine peut échouer même si le code est valide ; pour des tests automatisés, préférez des charges **ASCII** pour un aller-retour déterministe.
-
-```python
-from pathlib import Path
-
-from baobab_barcode import application, domain, infrastructure
-
-read = application.BarcodeReadService(
-    reader_registry=infrastructure.create_default_barcode_reader_registry(),
-)
-opts = domain.BarcodeReadOptions(expected_format=domain.BarcodeFormat.CODE128)
-# result = read.decode_from_file(Path("fichier.png"), opts)
-```
-
-## Development
-
-- Python 3.11 ou supérieur
-- Installation éditable : `pip install -e ".[dev]"`
 - Tests avec couverture : `pytest` (seuil minimal 90 % sur `src/baobab_barcode`)
 - Formatage : `black .`
 - Lint : `pylint src tests` et `flake8 src tests`
 - Types : `mypy`
 - Sécurité : `bandit -c pyproject.toml -r src`
+
+## Contribution
+
+1. Créer une branche à partir de `main`.
+2. Ajouter ou adapter des tests (`pytest`) et respecter la couverture minimale.
+3. Exécuter les outils de qualité listés ci-dessus.
+4. Proposer une pull request avec une description claire du comportement et du périmètre.
+
+Les demandes de fonctionnalités et les anomalies peuvent être suivies via les issues du dépôt.
 
 ## Licence
 

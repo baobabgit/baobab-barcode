@@ -1,4 +1,4 @@
-"""Smoke tests des exports infrastructure."""
+"""Smoke tests d'import du sous-package ``infrastructure``."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from baobab_barcode import infrastructure
 
 
 class TestInfrastructurePublicExports:
-    """Réexport du sous-package ``infrastructure``."""
+    """Sous-package ``infrastructure`` (import explicite, hors ``__all__`` racine)."""
 
     def test_infrastructure_package_exports(self) -> None:
         """Backends et fabrique de registre accessibles."""

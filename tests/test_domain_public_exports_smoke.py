@@ -1,4 +1,4 @@
-"""Smoke tests des exports du domaine."""
+"""Smoke tests d'import du sous-package ``domain``."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from baobab_barcode import domain
 
 
 class TestDomainPublicExports:
-    """Réexport du sous-package ``domain``."""
+    """Sous-package ``domain`` (import explicite, hors ``__all__`` racine)."""
 
     def test_domain_package_exports(self) -> None:
         """Les types publics du domaine sont accessibles via ``baobab_barcode.domain``."""

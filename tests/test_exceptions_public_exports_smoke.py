@@ -1,4 +1,4 @@
-"""Smoke tests des exports d'exceptions."""
+"""Smoke tests d'import du sous-package ``exceptions``."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from baobab_barcode import exceptions
 
 
 class TestExceptionsPublicExports:
-    """Réexport du sous-package ``exceptions``."""
+    """Sous-package ``exceptions`` (import explicite, hors ``__all__`` racine)."""
 
     def test_exceptions_package_exports(self) -> None:
         """Les exceptions publiques sont accessibles via ``baobab_barcode.exceptions``."""

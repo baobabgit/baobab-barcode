@@ -1,4 +1,4 @@
-"""Smoke tests des exports applicatifs."""
+"""Smoke tests d'import du sous-package ``application``."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from baobab_barcode import application
 
 
 class TestApplicationPublicExports:
-    """Réexport du sous-package ``application``."""
+    """Sous-package ``application`` (import explicite, hors ``__all__`` racine)."""
 
     def test_application_package_exports(self) -> None:
         """Les services applicatifs exposés sont importables."""

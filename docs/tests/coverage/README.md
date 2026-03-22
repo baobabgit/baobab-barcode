@@ -1,16 +1,27 @@
 # Rapports de couverture de tests
 
-Les sorties **HTML** et **XML** de `coverage` sont générées **localement** lors de l’exécution de `pytest` (voir `pyproject.toml`, options `pytest` / `coverage`).
+Les artefacts **coverage** sont centralisés ici (voir `[tool.coverage.*]` et `[tool.pytest.ini_options]` dans `pyproject.toml`).
 
-- `html/` : rapport navigable (ignoré par Git, régénéré à chaque run).
-- `coverage.xml` : export machine (ignoré par Git).
+| Fichier / dossier | Rôle |
+|-------------------|------|
+| `.coverage` | Données brutes (SQLite) produites par le moteur `coverage` |
+| `coverage.xml` | Export XML (CI, outils tiers) |
+| `html/` | Rapport HTML navigable (`index.html`) |
 
-Aucun accès réseau n’est requis : tout est produit par les outils Python du dépôt après `pip install -e ".[dev]"`.
+Ces chemins sont listés dans `.gitignore` : tout est régénéré localement par `pytest` (via **pytest-cov**), sans accès réseau, après `pip install -e ".[dev]"`.
+
+La configuration explicite `--cov-config=pyproject.toml` garantit que **pytest-cov** et **coverage** partagent les mêmes paramètres (`data_file`, rapports HTML/XML, seuil).
 
 Pour régénérer :
 
 ```bash
 python -m pytest
+```
+
+Pour supprimer les artefacts générés (Make) :
+
+```bash
+make clean-coverage
 ```
 
 Ouvrir ensuite `html/index.html` dans un navigateur pour consulter le détail des lignes couvertes.

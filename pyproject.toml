@@ -67,6 +67,7 @@ testpaths = ["tests"]
 pythonpath = ["src", "."]
 addopts = [
     "--cov=baobab_barcode",
+    "--cov-config=pyproject.toml",
     "--cov-report=term-missing",
     "--cov-report=html:docs/tests/coverage/html",
     "--cov-report=xml:docs/tests/coverage/coverage.xml",
@@ -76,6 +77,8 @@ addopts = [
 [tool.coverage.run]
 branch = true
 source = ["src/baobab_barcode"]
+data_file = "docs/tests/coverage/.coverage"
+relative_files = true
 
 [tool.coverage.report]
 fail_under = 90

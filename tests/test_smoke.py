@@ -1,7 +1,7 @@
 """Test minimal d'import du package."""
 
 import baobab_barcode
-from baobab_barcode import application, domain, exceptions, infrastructure
+from baobab_barcode import api, application, domain, exceptions, infrastructure
 
 
 class TestSmokeImport:
@@ -10,6 +10,17 @@ class TestSmokeImport:
     def test_project_import(self) -> None:
         """Vérifie que le package principal est importable."""
         assert baobab_barcode is not None
+
+
+class TestPublicFacadeSmoke:
+    """Façade publique sur le package racine."""
+
+    def test_api_subpackage_and_facade_functions(self) -> None:
+        """Sous-package ``api`` et fonctions ``generate`` / ``validate`` / ``decode``."""
+        assert api.generate is baobab_barcode.generate
+        assert api.validate_payload is baobab_barcode.validate_payload
+        assert api.decode_from_bytes is baobab_barcode.decode_from_bytes
+        assert api.decode_from_file is baobab_barcode.decode_from_file
 
 
 class TestDomainPublicExports:

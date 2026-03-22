@@ -1,8 +1,6 @@
-"""Tests du backend QR Code PNG."""
+"""Tests du backend QR Code PNG (comportement unitaire)."""
 
-# Les tests d'implémentation appellent des helpers internes ; les helpers ``_opts``
-# dupliquent volontairement le fichier CODE128 pour la lisibilité locale.
-# pylint: disable=duplicate-code,protected-access
+# pylint: disable=protected-access
 
 from __future__ import annotations
 
@@ -11,38 +9,19 @@ from typing import cast
 from unittest.mock import MagicMock, patch
 
 import pytest
-from PIL import Image, ImageFont
+from PIL import Image
 from qrcode.exceptions import DataOverflowError
 
 from baobab_barcode.application.ports.barcode_generator import BarcodeGenerator
-from baobab_barcode.application.services.barcode_generation_service import BarcodeGenerationService
 from baobab_barcode.domain.enums.barcode_format import BarcodeFormat
 from baobab_barcode.domain.results.generated_barcode import GeneratedBarcode
-from baobab_barcode.domain.value_objects.barcode_generation_options import BarcodeGenerationOptions
 from baobab_barcode.exceptions.barcode_rendering_exception import BarcodeRenderingException
-from baobab_barcode.infrastructure.generation.default_registry import (
-    create_default_barcode_generator_registry,
-)
 from baobab_barcode.infrastructure.generation.qrcode_png_barcode_generator import (
     QrCodePngBarcodeGenerator,
 )
-
-
-def _opts(
-    fmt: BarcodeFormat = BarcodeFormat.QR_CODE,
-    *,
-    image_format: str = "png",
-    width: int | None = None,
-    height: int | None = None,
-    include_text: bool = False,
-) -> BarcodeGenerationOptions:
-    return BarcodeGenerationOptions(
-        barcode_format=fmt,
-        width=width,
-        height=height,
-        image_format=image_format,
-        include_text=include_text,
-    )
+from tests.baobab_barcode.infrastructure.generation.qrcode_generation_test_helpers import (
+    qrcode_png_options,
+)
 
 
 class TestQrCodePngBarcodeGenerator:
@@ -51,14 +30,14 @@ class TestQrCodePngBarcodeGenerator:
     def test_generates_non_empty_png_simple_payload(self) -> None:
         """Contenu binaire non vide et en-tête PNG (payload ASCII)."""
         gen = QrCodePngBarcodeGenerator()
-        out = gen.generate("https://example.com", _opts(include_text=False))
+        out = gen.generate("https://example.com", qrcode_png_options(include_text=False))
         assert len(out.content) > 8
         assert out.content[:8] == b"\x89PNG\r\n\x1a\n"
 
     def test_generates_png_with_unicode_payload(self) -> None:
         """Unicode dans la charge encodée dans le QR (UTF-8)."""
         gen = QrCodePngBarcodeGenerator()
-        out = gen.generate("café 日本", _opts(include_text=False))
+        out = gen.generate("café 日本", qrcode_png_options(include_text=False))
         assert len(out.content) > 8
         assert out.content[:8] == b"\x89PNG\r\n\x1a\n"
         assert out.payload == "café 日本"
@@ -66,7 +45,7 @@ class TestQrCodePngBarcodeGenerator:
     def test_returned_metadata_matches_png(self) -> None:
         """MIME et extension cohérents avec PNG."""
         gen = QrCodePngBarcodeGenerator()
-        out = gen.generate("id-1", _opts(include_text=False))
+        out = gen.generate("id-1", qrcode_png_options(include_text=False))
         assert out.mime_type == "image/png"
         assert out.file_extension == "png"
         assert out.barcode_format == BarcodeFormat.QR_CODE
@@ -74,26 +53,26 @@ class TestQrCodePngBarcodeGenerator:
     def test_width_and_height_options_used(self) -> None:
         """Dimensions cibles appliquées sur l'image finale."""
         gen = QrCodePngBarcodeGenerator()
-        out = gen.generate("W", _opts(width=320, height=320, include_text=False))
+        out = gen.generate("W", qrcode_png_options(width=320, height=320, include_text=False))
         assert len(out.content) > 0
 
     def test_include_text_adds_caption_path(self) -> None:
         """Option ``include_text`` : légende sous le QR (chemin de composition)."""
         gen = QrCodePngBarcodeGenerator()
-        out = gen.generate("LABEL", _opts(include_text=True))
+        out = gen.generate("LABEL", qrcode_png_options(include_text=True))
         assert len(out.content) > 8
 
     def test_wrong_barcode_format_raises(self) -> None:
         """Un format autre que QR_CODE est refusé."""
         gen = QrCodePngBarcodeGenerator()
         with pytest.raises(BarcodeRenderingException):
-            gen.generate("x", _opts(BarcodeFormat.CODE128))
+            gen.generate("x", qrcode_png_options(BarcodeFormat.CODE128))
 
     def test_non_png_image_format_raises(self) -> None:
         """Seul ``png`` est supporté par ce backend."""
         gen = QrCodePngBarcodeGenerator()
         with pytest.raises(BarcodeRenderingException):
-            gen.generate("A", _opts(image_format="jpeg"))
+            gen.generate("A", qrcode_png_options(image_format="jpeg"))
 
     def test_data_overflow_wrapped(self) -> None:
         """Données trop volumineuses pour la version QR : encapsulation."""
@@ -103,7 +82,7 @@ class TestQrCodePngBarcodeGenerator:
         ) as mock_cls:
             mock_cls.return_value.make.side_effect = DataOverflowError("overflow")
             with pytest.raises(BarcodeRenderingException) as ctx:
-                gen.generate("x", _opts(include_text=False))
+                gen.generate("x", qrcode_png_options(include_text=False))
             assert "volumineuses" in str(ctx.value) or "QR" in str(ctx.value)
 
     def test_value_error_wrapped(self) -> None:
@@ -115,7 +94,7 @@ class TestQrCodePngBarcodeGenerator:
             side_effect=ValueError("bad dim"),
         ):
             with pytest.raises(BarcodeRenderingException) as ctx:
-                gen.generate("x", _opts(width=10, include_text=False))
+                gen.generate("x", qrcode_png_options(width=10, include_text=False))
         assert "bad dim" in str(ctx.value)
 
     def test_os_error_on_save_wrapped(self) -> None:
@@ -134,7 +113,7 @@ class TestQrCodePngBarcodeGenerator:
             )
             with patch(save_target, _raise):
                 with pytest.raises(BarcodeRenderingException) as ctx:
-                    gen.generate("ABC", _opts(include_text=False))
+                    gen.generate("ABC", qrcode_png_options(include_text=False))
         assert "simulated save" in str(ctx.value) or "écriture" in str(ctx.value).lower()
 
     def test_empty_buffer_raises(self) -> None:
@@ -150,26 +129,26 @@ class TestQrCodePngBarcodeGenerator:
             _EmptyBytesIO,
         ):
             with pytest.raises(BarcodeRenderingException) as ctx:
-                gen.generate("XYZ", _opts(include_text=False))
+                gen.generate("XYZ", qrcode_png_options(include_text=False))
             assert "aucun octet" in str(ctx.value).lower()
 
     def test_satisfies_barcode_generator_port(self) -> None:
         """Le backend respecte le port :class:`BarcodeGenerator` (appel typé)."""
         gen = QrCodePngBarcodeGenerator()
         port = cast(BarcodeGenerator, gen)
-        out = port.generate("PORT", _opts(include_text=False))
+        out = port.generate("PORT", qrcode_png_options(include_text=False))
         assert isinstance(out, GeneratedBarcode)
 
     def test_resize_only_width(self) -> None:
         """Redimensionnement proportionnel si seule la largeur est fournie."""
         gen = QrCodePngBarcodeGenerator()
-        out = gen.generate("R", _opts(width=400, include_text=False))
+        out = gen.generate("R", qrcode_png_options(width=400, include_text=False))
         assert len(out.content) > 0
 
     def test_resize_only_height(self) -> None:
         """Redimensionnement proportionnel si seule la hauteur est fournie."""
         gen = QrCodePngBarcodeGenerator()
-        out = gen.generate("R", _opts(height=300, include_text=False))
+        out = gen.generate("R", qrcode_png_options(height=300, include_text=False))
         assert len(out.content) > 0
 
     def test_render_qr_matrix_converts_grayscale_to_rgb(self) -> None:
@@ -184,6 +163,18 @@ class TestQrCodePngBarcodeGenerator:
             rgb = gen._render_qr_matrix("payload", box_size=10)
         assert rgb.mode == "RGB"
 
+    def test_render_qr_matrix_keeps_rgb(self) -> None:
+        """Image déjà en ``RGB`` : aucune conversion intermédiaire."""
+        gen = QrCodePngBarcodeGenerator()
+        mock_qr = MagicMock()
+        mock_qr.make_image.return_value = Image.new("RGB", (48, 48), (255, 255, 255))
+        with patch(
+            "baobab_barcode.infrastructure.generation.qrcode_png_barcode_generator.LibQRCode",
+            return_value=mock_qr,
+        ):
+            rgb = gen._render_qr_matrix("rgb", box_size=7)
+        assert rgb.mode == "RGB"
+
     def test_render_qr_matrix_converts_rgba_to_rgb(self) -> None:
         """Image ``RGBA`` : fusion sur fond blanc puis RVB."""
         gen = QrCodePngBarcodeGenerator()
@@ -194,6 +185,18 @@ class TestQrCodePngBarcodeGenerator:
             return_value=mock_qr,
         ):
             rgb = gen._render_qr_matrix("rgba", box_size=6)
+        assert rgb.mode == "RGB"
+
+    def test_render_qr_matrix_converts_palette_to_rgb(self) -> None:
+        """Image ``P`` (palette) : conversion explicite en RVB."""
+        gen = QrCodePngBarcodeGenerator()
+        mock_qr = MagicMock()
+        mock_qr.make_image.return_value = Image.new("P", (40, 40), 0)
+        with patch(
+            "baobab_barcode.infrastructure.generation.qrcode_png_barcode_generator.LibQRCode",
+            return_value=mock_qr,
+        ):
+            rgb = gen._render_qr_matrix("pal", box_size=5)
         assert rgb.mode == "RGB"
 
     def test_render_qr_matrix_uses_get_image_when_present(self) -> None:
@@ -215,33 +218,3 @@ class TestQrCodePngBarcodeGenerator:
         ):
             rgb = gen._render_qr_matrix("w", box_size=8)
         assert rgb.mode == "RGB"
-
-
-class TestQrCodeFontFallback:
-    """Chemins de secours pour la police de légende."""
-
-    def test_truetype_oserror_falls_back_to_default_font(self) -> None:
-        """Si ``truetype`` échoue pour tous les chemins, repli sur ``load_default``."""
-        gen = QrCodePngBarcodeGenerator()
-        real_default = ImageFont.load_default()
-        mod = "baobab_barcode.infrastructure.generation.qrcode_png_barcode_generator.ImageFont"
-        with patch(f"{mod}.truetype", side_effect=OSError("no font")):
-            with patch(f"{mod}.load_default", return_value=real_default):
-                out = gen.generate("txt", _opts(include_text=True))
-        assert len(out.content) > 8
-
-
-class TestQrCodeIntegrationWithCoreService:
-    """Intégration avec :class:`BarcodeGenerationService`."""
-
-    def test_end_to_end_qr_png(self) -> None:
-        """Service cœur + registre par défaut produit un PNG QR valide."""
-        service = BarcodeGenerationService(
-            generator_registry=create_default_barcode_generator_registry(),
-        )
-        out = service.generate(
-            "https://e2e.example/path",
-            _opts(width=256, height=256, include_text=False),
-        )
-        assert out.content[:8] == b"\x89PNG\r\n\x1a\n"
-        assert out.mime_type == "image/png"

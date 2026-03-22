@@ -148,9 +148,10 @@ class QrCodePngBarcodeGenerator:
         w, h = options.width, options.height
         if w is None and h is None:
             return _DEFAULT_BOX
-        ref = w if w is not None else h
-        if ref is None:
-            return _DEFAULT_BOX
+        if w is not None:
+            ref = w
+        else:
+            ref = cast(int, h)
         bounded = max(120, min(2000, ref))
         return max(4, min(24, bounded // 25))
 
@@ -170,8 +171,7 @@ class QrCodePngBarcodeGenerator:
             ratio = width / w0
             new_h = max(1, int(round(h0 * ratio)))
             return img.resize((width, new_h), Image.Resampling.LANCZOS)
-        if height is None:
-            return img
-        ratio = height / h0
+        height_target = cast(int, height)
+        ratio = height_target / h0
         new_w = max(1, int(round(w0 * ratio)))
-        return img.resize((new_w, height), Image.Resampling.LANCZOS)
+        return img.resize((new_w, height_target), Image.Resampling.LANCZOS)

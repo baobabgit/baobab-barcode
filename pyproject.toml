@@ -38,6 +38,11 @@ include = '\.pyi?$'
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+addopts = [
+    "--cov=baobab_barcode",
+    "--cov-report=term-missing",
+    "--cov-fail-under=90",
+]
 
 [tool.coverage.run]
 branch = true

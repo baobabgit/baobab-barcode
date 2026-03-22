@@ -45,3 +45,6 @@ class TestApplicationPublicExports:
         """Les services applicatifs exposés sont importables."""
         assert application.PayloadValidationService is not None
         assert application.PayloadNormalizationService is not None
+        assert application.BarcodeGenerator is not None
+        assert application.BarcodeGenerationService is not None
+        assert application.BarcodeGeneratorRegistry is not None

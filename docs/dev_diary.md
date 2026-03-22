@@ -1,5 +1,25 @@
 # Journal de développement
 
+## 2025-03-22 20:15:00 UTC
+
+### Feature : 07_qrcode_generation_backend
+
+### Modifications
+
+- Backend `QrCodePngBarcodeGenerator` (PNG, MIME `image/png`, extension `png`) encapsulant `qrcode` et Pillow (matrice QR, redimensionnement, légende optionnelle sous le QR si `include_text`), sans exposition de types tiers dans l’API publique.
+- Données texte en UTF-8 (Unicode) pour la charge ; dimensions cibles et format PNG pris en compte.
+- `create_default_barcode_generator_registry` enregistre aussi `BarcodeFormat.QR_CODE` ; dépendance `qrcode` dans `pyproject.toml` avec contrainte de version.
+
+### Buts
+
+- Compléter la génération raster par défaut pour le QR Code tout en gardant le domaine et les ports stables.
+
+### Impact
+
+- Les utilisateurs peuvent produire des PNG QR valides sans coupler leur code à la bibliothèque tierce.
+
+---
+
 ## 2025-03-22 19:45:00 UTC
 
 ### Feature : 06_code128_generation_backend

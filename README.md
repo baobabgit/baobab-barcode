@@ -43,6 +43,21 @@ opts = domain.BarcodeGenerationOptions(
 
 Voir aussi `CHANGELOG.md` pour le détail des ajouts récents.
 
+## Erreurs
+
+Toutes les erreurs prévues par la librairie héritent de `baobab_barcode.exceptions.BaobabBarcodeException`. Vous pouvez les intercepter globalement ou par type spécialisé (valeur invalide, format non supporté, échec de rendu, de décodage ou de validation).
+
+```python
+from baobab_barcode import exceptions
+
+try:
+    raise exceptions.InvalidBarcodeValueException("caractère non autorisé")
+except exceptions.BaobabBarcodeException as exc:
+    print(exc)
+```
+
+Les messages par défaut sont exposés sur chaque classe via l'attribut de classe `DEFAULT_MESSAGE`.
+
 ## Development
 
 - Python 3.11 ou supérieur

@@ -11,3 +11,4 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 - Modèles de domaine publics : `BarcodeFormat`, `BarcodeGenerationOptions`, `BarcodeReadOptions`, `GeneratedBarcode`, `DecodeResult`, `ValidationResult`.
 - Export du sous-package `domain` depuis `baobab_barcode` pour un accès direct aux types.
+- Hiérarchie d'exceptions : `BaobabBarcodeException` et sous-classes (`InvalidBarcodeValueException`, `UnsupportedBarcodeFormatException`, `BarcodeRenderingException`, `BarcodeDecodingException`, `BarcodeValidationException`) ; export du sous-package `exceptions`.

@@ -131,6 +131,26 @@ assert generated.mime_type == "image/png"
 # generated.content : octets PNG
 ```
 
+### Exemple — génération QR Code en PNG
+
+```python
+from baobab_barcode import application, domain, infrastructure
+
+opts = domain.BarcodeGenerationOptions(
+    barcode_format=domain.BarcodeFormat.QR_CODE,
+    width=280,
+    height=280,
+    image_format="png",
+    include_text=False,
+)
+service = application.BarcodeGenerationService(
+    generator_registry=infrastructure.create_default_barcode_generator_registry(),
+)
+generated = service.generate("https://example.com/lien-unicode", opts)
+assert generated.mime_type == "image/png"
+# generated.content : octets PNG
+```
+
 ## Development
 
 - Python 3.11 ou supérieur

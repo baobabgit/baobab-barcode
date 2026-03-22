@@ -6,5 +6,12 @@ from baobab_barcode.infrastructure.generation.code128_png_barcode_generator impo
 from baobab_barcode.infrastructure.generation.default_registry import (
     create_default_barcode_generator_registry,
 )
+from baobab_barcode.infrastructure.generation.qrcode_png_barcode_generator import (
+    QrCodePngBarcodeGenerator,
+)
 
-__all__ = ["Code128PngBarcodeGenerator", "create_default_barcode_generator_registry"]
+__all__ = [
+    "Code128PngBarcodeGenerator",
+    "QrCodePngBarcodeGenerator",
+    "create_default_barcode_generator_registry",
+]

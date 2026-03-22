@@ -56,4 +56,5 @@ class TestInfrastructurePublicExports:
     def test_infrastructure_package_exports(self) -> None:
         """Backends et fabrique de registre accessibles."""
         assert infrastructure.Code128PngBarcodeGenerator is not None
+        assert infrastructure.QrCodePngBarcodeGenerator is not None
         assert infrastructure.create_default_barcode_generator_registry is not None

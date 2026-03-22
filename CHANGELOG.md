@@ -7,6 +7,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Unreleased]
 
+### Added
+
+- **CI** : workflow GitHub Actions `.github/workflows/ci.yml` (push et pull request) — installation éditable avec `[dev]`, `pytest` avec seuils de couverture du projet, Black, Pylint, Mypy, Flake8, Bandit, build du paquet ; matrice Python 3.11 / 3.12 / 3.13 sur Ubuntu (`libzbar0` pour *pyzbar*).
+
 ### Changed
 
 - **Package racine** : `__all__` et chargement du `__init__` limités à `__version__` et aux quatre fonctions de façade (`generate`, `validate_payload`, `decode_from_bytes`, `decode_from_file`). Les sous-packages `api`, `application`, `domain`, `exceptions` et `infrastructure` ne sont plus importés à l’import du package racine ; ils restent accessibles par import explicite (`from baobab_barcode import domain`, `import baobab_barcode.api`, attributs de module après import du sous-package, etc.).

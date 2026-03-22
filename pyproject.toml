@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "baobab-barcode"
+version = "0.1.0"
+description = "Bibliothèque Python pour la génération et la lecture de codes-barres."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [{ name = "Baobab Barcode contributors" }]
+keywords = ["barcode", "code128", "qrcode"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0,<9.0.0",
+    "black>=24.0.0,<26.0.0",
+    "pylint>=3.0.0,<5.0.0",
+    "mypy>=1.8.0,<2.0.0",
+    "bandit>=1.7.0,<2.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+baobab_barcode = ["py.typed"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+include = '\.pyi?$'
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+explicit_package_bases = true
+mypy_path = "src"
+files = ["src/baobab_barcode", "tests"]
+
+[tool.pylint.main]
+fail-under = 9.0
+jobs = 0
+py-version = "3.11"
+source-roots = ["src"]
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint."messages control"]
+disable = [
+    "too-few-public-methods",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests"]

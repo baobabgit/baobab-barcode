@@ -1,5 +1,25 @@
 # Journal de développement
 
+## 2025-03-22 20:45:00 UTC
+
+### Feature : 09_decode_backend_integration
+
+### Modifications
+
+- Backend `PngZbarBarcodeReader` (PNG, pyzbar/zbar, Pillow) pour `CODE128` et `QR_CODE`, retour systématique en `DecodeResult`, sans exposition de types tiers.
+- `create_default_barcode_reader_registry` pour brancher le décodage sur `BarcodeReadService` ; dépendance `pyzbar` dans `pyproject.toml`.
+- Documentation des limites (PNG, zbar, comportement Unicode QR) dans le README et la doc du backend.
+
+### Buts
+
+- Permettre un aller-retour réaliste avec les générateurs PNG existants tout en gardant les ports applicatifs stables.
+
+### Impact
+
+- Les utilisateurs peuvent lire des PNG générés par la lib sans coupler leur code à pyzbar, sous réserve des limites documentées.
+
+---
+
 ## 2025-03-22 20:30:00 UTC
 
 ### Feature : 08_reader_ports_and_core_service

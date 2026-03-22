@@ -180,6 +180,28 @@ assert service.decode_from_bytes(b"demo", opts).success is True
 # service.decode_from_file(Path("capture.png"), opts) lit le fichier puis délègue au même chemin
 ```
 
+### Décodeur PNG par défaut (pyzbar / zbar)
+
+`infrastructure.PngZbarBarcodeReader` et `infrastructure.create_default_barcode_reader_registry()` ciblent les PNG **CODE128** et **QR_CODE** produits par les générateurs par défaut (même bibliothèque, flux binaire PNG).
+
+**Limites utiles à connaître**
+
+- Ce backend accepte des entrées **PNG** (signature et ouverture Pillow) ; tout autre format renvoie un `DecodeResult` d’échec sans lever d’exception.
+- La couche native **zbar** (paquet **pyzbar**) doit être disponible sur la machine (binaires fournis ou installés selon l’OS).
+- Pour le **QR Code**, le texte décodé est interprété en **UTF-8**. Selon la façon dont le générateur encode la charge (modes mixtes, kanji, etc.), une comparaison octet à octet avec la chaîne d’origine peut échouer même si le code est valide ; pour des tests automatisés, préférez des charges **ASCII** pour un aller-retour déterministe.
+
+```python
+from pathlib import Path
+
+from baobab_barcode import application, domain, infrastructure
+
+read = application.BarcodeReadService(
+    reader_registry=infrastructure.create_default_barcode_reader_registry(),
+)
+opts = domain.BarcodeReadOptions(expected_format=domain.BarcodeFormat.CODE128)
+# result = read.decode_from_file(Path("fichier.png"), opts)
+```
+
 ## Development
 
 - Python 3.11 ou supérieur

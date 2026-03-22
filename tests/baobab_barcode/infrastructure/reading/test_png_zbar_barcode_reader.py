@@ -1,0 +1,162 @@
+"""Tests du décodeur PNG pyzbar et intégration avec la génération."""
+
+from __future__ import annotations
+
+from io import BytesIO
+from types import SimpleNamespace
+from typing import cast
+from unittest.mock import patch
+
+import pytest
+from PIL import Image
+
+from baobab_barcode import application, infrastructure
+from baobab_barcode.application.ports.barcode_reader import BarcodeReader
+from baobab_barcode.domain.enums.barcode_format import BarcodeFormat
+from baobab_barcode.domain.results.decode_result import DecodeResult
+from baobab_barcode.domain.value_objects.barcode_generation_options import BarcodeGenerationOptions
+from baobab_barcode.domain.value_objects.barcode_read_options import BarcodeReadOptions
+from baobab_barcode.exceptions.barcode_decoding_exception import BarcodeDecodingException
+from baobab_barcode.infrastructure.reading.png_zbar_barcode_reader import PngZbarBarcodeReader
+
+
+def _gen_opts(fmt: BarcodeFormat) -> BarcodeGenerationOptions:
+    return BarcodeGenerationOptions(
+        barcode_format=fmt,
+        width=320,
+        height=160 if fmt == BarcodeFormat.CODE128 else 280,
+        image_format="png",
+        include_text=False,
+    )
+
+
+def _read_opts(fmt: BarcodeFormat) -> BarcodeReadOptions:
+    return BarcodeReadOptions(expected_format=fmt, strict_mode=False)
+
+
+class TestPngZbarRoundTrip:
+    """Round-trip génération → décodage."""
+
+    def test_round_trip_code128_generate_then_decode(self) -> None:
+        """CODE128 : PNG produit par la lib est relu par le décodeur."""
+        gen_reg = infrastructure.create_default_barcode_generator_registry()
+        gs = application.BarcodeGenerationService(generator_registry=gen_reg)
+        payload = "RT-CODE128-9"
+        png = gs.generate(payload, _gen_opts(BarcodeFormat.CODE128)).content
+
+        read_reg = infrastructure.create_default_barcode_reader_registry()
+        rs = application.BarcodeReadService(reader_registry=read_reg)
+        out = rs.decode_from_bytes(png, _read_opts(BarcodeFormat.CODE128))
+        assert out.success is True
+        assert out.payload == payload
+        assert out.barcode_format == BarcodeFormat.CODE128
+
+    def test_round_trip_qr_generate_then_decode(self) -> None:
+        """QR Code : PNG produit par la lib est relu (charge ASCII stable côté zbar)."""
+        gen_reg = infrastructure.create_default_barcode_generator_registry()
+        gs = application.BarcodeGenerationService(generator_registry=gen_reg)
+        payload = "https://example.com/qr-round-trip"
+        png = gs.generate(payload, _gen_opts(BarcodeFormat.QR_CODE)).content
+
+        read_reg = infrastructure.create_default_barcode_reader_registry()
+        rs = application.BarcodeReadService(reader_registry=read_reg)
+        out = rs.decode_from_bytes(png, _read_opts(BarcodeFormat.QR_CODE))
+        assert out.success is True
+        assert out.payload == payload
+        assert out.barcode_format == BarcodeFormat.QR_CODE
+
+
+class TestPngZbarBarcodeReader:
+    """Comportement unitaire du backend."""
+
+    def test_decode_fails_on_non_png_bytes(self) -> None:
+        """Contenu non PNG : échec structuré."""
+        reader = PngZbarBarcodeReader()
+        out = reader.decode_from_bytes(b"not-a-png", _read_opts(BarcodeFormat.CODE128))
+        assert out.success is False
+        assert out.payload is None
+
+    def test_decode_fails_when_no_symbol(self) -> None:
+        """PNG valide sans code-barres : échec structuré."""
+        buf = BytesIO()
+        Image.new("RGB", (64, 64), color="white").save(buf, format="PNG")
+        reader = PngZbarBarcodeReader()
+        out = reader.decode_from_bytes(buf.getvalue(), _read_opts(BarcodeFormat.CODE128))
+        assert out.success is False
+
+    def test_decode_fails_wrong_expected_format(self) -> None:
+        """Symbole présent mais autre type que ``expected_format`` : échec."""
+        gen_reg = infrastructure.create_default_barcode_generator_registry()
+        gs = application.BarcodeGenerationService(generator_registry=gen_reg)
+        png = gs.generate("ONLY-QR", _gen_opts(BarcodeFormat.QR_CODE)).content
+        reader = PngZbarBarcodeReader()
+        out = reader.decode_from_bytes(png, _read_opts(BarcodeFormat.CODE128))
+        assert out.success is False
+
+    def test_corrupt_png_raises_barcode_decoding_exception(self) -> None:
+        """PNG corrompu après en-tête : exception projet."""
+        reader = PngZbarBarcodeReader()
+        corrupt = b"\x89PNG\r\n\x1a\n" + b"\x00" * 8
+        with pytest.raises(BarcodeDecodingException):
+            reader.decode_from_bytes(corrupt, _read_opts(BarcodeFormat.CODE128))
+
+    def test_satisfies_barcode_reader_port(self) -> None:
+        """Le backend respecte le port :class:`BarcodeReader`."""
+        reader = PngZbarBarcodeReader()
+        port = cast(BarcodeReader, reader)
+        out = port.decode_from_bytes(b"abc", _read_opts(BarcodeFormat.CODE128))
+        assert isinstance(out, DecodeResult)
+
+    def test_expected_format_none_returns_failure(self) -> None:
+        """``expected_format`` absent : échec structuré (appel direct au backend)."""
+        reader = PngZbarBarcodeReader()
+        buf = BytesIO()
+        Image.new("RGB", (32, 32), color="white").save(buf, format="PNG")
+        out = reader.decode_from_bytes(buf.getvalue(), BarcodeReadOptions(expected_format=None))
+        assert out.success is False
+
+    def test_pyzbar_symbol_type_as_bytes(self) -> None:
+        """pyzbar peut exposer ``type`` en ``bytes`` : décodage identique."""
+        buf = BytesIO()
+        Image.new("RGB", (48, 48), color="white").save(buf, format="PNG")
+        fake = SimpleNamespace(type=b"CODE128", data=b"OK-BYTES")
+        target = "baobab_barcode.infrastructure.reading.png_zbar_barcode_reader.zbar_decode"
+        with patch(target, return_value=[fake]):
+            reader = PngZbarBarcodeReader()
+            out = reader.decode_from_bytes(buf.getvalue(), _read_opts(BarcodeFormat.CODE128))
+        assert out.success is True
+        assert out.payload == "OK-BYTES"
+
+    def test_unknown_symbol_type_from_engine_is_ignored(self) -> None:
+        """Symbologie non gérée par le mapping : ignorée jusqu'à échec."""
+        buf = BytesIO()
+        Image.new("RGB", (40, 40), color="white").save(buf, format="PNG")
+        fake = SimpleNamespace(type="CODE39", data=b"1")
+        target = "baobab_barcode.infrastructure.reading.png_zbar_barcode_reader.zbar_decode"
+        with patch(target, return_value=[fake]):
+            reader = PngZbarBarcodeReader()
+            out = reader.decode_from_bytes(buf.getvalue(), _read_opts(BarcodeFormat.CODE128))
+        assert out.success is False
+
+    def test_value_error_from_pil_raises_barcode_decoding_exception(self) -> None:
+        """Erreur de valeur côté Pillow : encapsulation."""
+        target = "baobab_barcode.infrastructure.reading.png_zbar_barcode_reader.Image.open"
+        with patch(target, side_effect=ValueError("bad")):
+            reader = PngZbarBarcodeReader()
+            with pytest.raises(BarcodeDecodingException):
+                reader.decode_from_bytes(
+                    b"\x89PNG\r\n\x1a\n" + b"\x00" * 40,
+                    _read_opts(BarcodeFormat.CODE128),
+                )
+
+    def test_os_error_from_pil_raises_barcode_decoding_exception(self) -> None:
+        """Erreur OS côté Pillow : encapsulation."""
+        target = "baobab_barcode.infrastructure.reading.png_zbar_barcode_reader.Image.open"
+        with patch(target, side_effect=OSError("io")):
+            reader = PngZbarBarcodeReader()
+            with pytest.raises(BarcodeDecodingException) as ctx:
+                reader.decode_from_bytes(
+                    b"\x89PNG\r\n\x1a\n" + b"\x00" * 40,
+                    _read_opts(BarcodeFormat.CODE128),
+                )
+        assert "ouvrir" in str(ctx.value).lower() or "PNG" in str(ctx.value)

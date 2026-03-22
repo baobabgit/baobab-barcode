@@ -81,7 +81,9 @@ class TestBarcodeReadService:
         service = BarcodeReadService(readers_by_format={})
         with pytest.raises(UnsupportedBarcodeFormatException) as ctx:
             service.decode_from_bytes(b"data", _opts())
-        assert "Aucun décodeur" in str(ctx.value)
+        msg = str(ctx.value)
+        assert "Aucun décodeur" in msg
+        assert "[decode]" in msg
 
     def test_file_not_found_raises(self, tmp_path: Path) -> None:
         """Fichier introuvable : FileNotFoundError propagée."""

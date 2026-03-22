@@ -15,3 +15,4 @@ class TestInfrastructurePublicExports:
         assert infrastructure.create_default_barcode_generator_registry is not None
         assert infrastructure.PngZbarBarcodeReader is not None
         assert infrastructure.create_default_barcode_reader_registry is not None
+        assert infrastructure.is_decode_backend_available is not None

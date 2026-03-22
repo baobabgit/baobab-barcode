@@ -1,8 +1,13 @@
 """Cas d'usage et orchestration applicative."""
 
 from baobab_barcode.application.ports.barcode_generator import BarcodeGenerator
+from baobab_barcode.application.ports.barcode_reader import BarcodeReader
 from baobab_barcode.application.services.barcode_generation_service import BarcodeGenerationService
 from baobab_barcode.application.services.barcode_generator_registry import BarcodeGeneratorRegistry
+from baobab_barcode.application.services.barcode_read_service import (
+    BarcodeReaderRegistry,
+    BarcodeReadService,
+)
 from baobab_barcode.application.services.payload_normalization_service import (
     PayloadNormalizationService,
 )
@@ -15,6 +20,9 @@ __all__ = [
     "BarcodeGenerationService",
     "BarcodeGenerator",
     "BarcodeGeneratorRegistry",
+    "BarcodeReadService",
+    "BarcodeReader",
+    "BarcodeReaderRegistry",
     "Code128PayloadValidator",
     "PayloadNormalizationService",
     "PayloadValidator",

@@ -1,5 +1,24 @@
 # Journal de développement
 
+## 2025-03-22 20:30:00 UTC
+
+### Feature : 08_reader_ports_and_core_service
+
+### Modifications
+
+- Port `BarcodeReader` (`Protocol`) avec `decode_from_bytes` ; registre `BarcodeReaderRegistry` ; service `BarcodeReadService` avec `decode_from_file` et `decode_from_bytes` (sélection du backend via `BarcodeReadOptions.expected_format`), sans dépendance externe dans la couche applicative.
+- Gestion : octets vides → `DecodeResult` d’échec ; fichier manquant → `FileNotFoundError` ; erreur de lecture → `BarcodeDecodingException` ; décodeur absent ou `expected_format` non précisé → `UnsupportedBarcodeFormatException`.
+
+### Buts
+
+- Offrir un cœur de lecture testable et interchangeable avant les adaptateurs infrastructure.
+
+### Impact
+
+- Les backends de décodage pourront être branchés de la même façon que la génération, avec un contrat stable.
+
+---
+
 ## 2025-03-22 20:15:00 UTC
 
 ### Feature : 07_qrcode_generation_backend

@@ -48,6 +48,9 @@ class TestApplicationPublicExports:
         assert application.BarcodeGenerator is not None
         assert application.BarcodeGenerationService is not None
         assert application.BarcodeGeneratorRegistry is not None
+        assert application.BarcodeReader is not None
+        assert application.BarcodeReadService is not None
+        assert application.BarcodeReaderRegistry is not None
 
 
 class TestInfrastructurePublicExports:

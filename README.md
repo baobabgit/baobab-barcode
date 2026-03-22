@@ -151,6 +151,35 @@ assert generated.mime_type == "image/png"
 # generated.content : octets PNG
 ```
 
+## Architecture — lecture
+
+La lecture suit la même séparation **port / adaptateurs** que la génération :
+
+1. **`application.BarcodeReader`** (`Protocol`) : contrat des décodeurs (image, flux binaire, etc. dans la couche infrastructure).
+2. **`application.BarcodeReaderRegistry`** : associe chaque `BarcodeFormat` à une implémentation du port.
+3. **`application.BarcodeReadService`** : expose `decode_from_file` et `decode_from_bytes`, résout le décodeur selon `BarcodeReadOptions.expected_format`, retourne un `DecodeResult`.
+
+Les octets vides produisent un `DecodeResult` d’échec sans appeler le backend. Un fichier absent lève **`FileNotFoundError`**. Une erreur de lecture (permissions, etc.) est encapsulée dans **`BarcodeDecodingException`**. Si aucun décodeur n’est enregistré pour le format demandé, **`UnsupportedBarcodeFormatException`**.
+
+```python
+from baobab_barcode import application, domain
+
+class FakeReader:
+    def decode_from_bytes(self, content: bytes, options: domain.BarcodeReadOptions):
+        return domain.DecodeResult(
+            success=True,
+            payload=content.decode("ascii", errors="replace"),
+            barcode_format=options.expected_format,
+        )
+
+service = application.BarcodeReadService(
+    readers_by_format={domain.BarcodeFormat.QR_CODE: FakeReader()},
+)
+opts = domain.BarcodeReadOptions(expected_format=domain.BarcodeFormat.QR_CODE)
+assert service.decode_from_bytes(b"demo", opts).success is True
+# service.decode_from_file(Path("capture.png"), opts) lit le fichier puis délègue au même chemin
+```
+
 ## Development
 
 - Python 3.11 ou supérieur

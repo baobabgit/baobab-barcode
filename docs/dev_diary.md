@@ -1,5 +1,27 @@
 # Journal de développement
 
+## 2026-03-22 12:00:00 UTC
+
+### Feature : 12_release_readiness
+
+### Modifications
+
+- `pyproject.toml` : `classifiers` PyPI, `[project.urls]` (dépôt, documentation, changelog, issues), extra `dev` avec `build` pour les artefacts wheel/sdist.
+- `LICENSE` : plage de copyright 2025–2026.
+- `README.md` : tableau projet (PyPI, import, version, Python, licence), installation PyPI / sources, prérequis zbar, construction `python -m build`, liens utiles, qualité inchangée.
+- `CHANGELOG.md` : section `[0.1.0]` datée, lien de release cible ; section `[Unreleased]` vide pour la suite.
+- `baobab_barcode.__version__` : commentaire d’alignement avec `pyproject.toml`.
+
+### Buts
+
+- Préparer une première release **0.1.0** publiable : packaging cohérent, documentation et historique figés pour SemVer.
+
+### Impact
+
+- Les utilisateurs et l’index PyPI disposent de métadonnées complètes ; les contributeurs peuvent produire des wheels reproductibles.
+
+---
+
 ## 2025-03-22 22:30:00 UTC
 
 ### Feature : 11_test_quality_and_ci_hardening

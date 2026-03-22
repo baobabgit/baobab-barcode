@@ -2,6 +2,14 @@
 
 Bibliothèque Python pour **valider**, **générer** et **décoder** des codes-barres (CODE128, QR Code) avec une API publique simple, tout en conservant une architecture **domaine / application / infrastructure** pour les intégrations avancées.
 
+| | |
+|---|---|
+| **Paquet PyPI** | [`baobab-barcode`](https://pypi.org/project/baobab-barcode/) (après publication) |
+| **Import Python** | `baobab_barcode` |
+| **Version** | `0.1.0` (voir [`CHANGELOG.md`](CHANGELOG.md) et [SemVer](https://semver.org/lang/fr/)) |
+| **Python** | 3.11 ou supérieur |
+| **Licence** | MIT ([`LICENSE`](LICENSE)) |
+
 ## Description
 
 - **Validation** de charges utiles par symbologie (résultats explicites, sans exception pour les cas courants).
@@ -12,13 +20,23 @@ Les erreurs prévues héritent de `baobab_barcode.exceptions.BaobabBarcodeExcept
 
 ## Installation
 
-En développement, depuis la racine du dépôt :
+### Depuis PyPI (recommandé après publication)
 
 ```bash
+pip install baobab-barcode
+```
+
+Les métadonnées du projet (dépendances, classifiers, liens) sont définies dans [`pyproject.toml`](pyproject.toml).
+
+### Depuis les sources (dépôt Git)
+
+```bash
+git clone https://github.com/baobabgit/baobab-barcode.git
+cd baobab-barcode
 pip install -e .
 ```
 
-Pour installer aussi les outils de développement :
+Pour le développement (tests et outils de qualité) :
 
 ```bash
 pip install -e ".[dev]"
@@ -26,9 +44,13 @@ pip install -e ".[dev]"
 
 **Prérequis** : Python **3.11** ou supérieur.
 
+### Prérequis système (décodage)
+
+Le décodage par défaut repose sur **pyzbar**, qui utilise la bibliothèque native **zbar**. Sur votre plateforme, installez le paquet système ou binaire **zbar** attendu par pyzbar (voir la documentation de [pyzbar](https://github.com/NaturalHistoryMuseum/pyzbar)).
+
 ## Utilisation rapide (façade publique)
 
-Les fonctions suivantes sont exposées directement sur le package `baobab_barcode` :
+Les fonctions suivantes sont exposées sur le package racine et listées dans `baobab_barcode.__all__` :
 
 | Fonction | Rôle |
 |----------|------|
@@ -36,6 +58,8 @@ Les fonctions suivantes sont exposées directement sur le package `baobab_barcod
 | `generate(...)` | Génère une image (backends par défaut). |
 | `decode_from_bytes(...)` | Décode depuis un tampon d’octets. |
 | `decode_from_file(...)` | Décode depuis un chemin de fichier. |
+
+La version exposée côté code est disponible via `baobab_barcode.__version__` (alignée sur la version du paquet dans `pyproject.toml`).
 
 ```python
 import baobab_barcode
@@ -111,7 +135,7 @@ opts = domain.BarcodeGenerationOptions(
 )
 ```
 
-Voir `CHANGELOG.md` pour l’historique des ajouts.
+L’historique des versions et les changements notables sont décrits dans [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Erreurs
 
@@ -155,6 +179,20 @@ pip install -e ".[dev]"
 
 Les paramètres des outils (Black, Flake8, Mypy, Pylint, Bandit, Pytest, Coverage) sont centralisés dans `pyproject.toml` lorsque c’est possible.
 
+### Construction d’artefacts (wheel / sdist)
+
+Avec les extras `[dev]`, le paquet [`build`](https://pypi.org/project/build/) est disponible :
+
+```bash
+python -m build
+```
+
+Les sorties sont créées sous `dist/` (à ne pas versionner). Vérifier une installation propre dans un environnement virtuel :
+
+```bash
+pip install dist/baobab_barcode-0.1.0-py3-none-any.whl
+```
+
 ### Rapports de couverture
 
 Les rapports HTML et XML sont écrits sous `docs/tests/coverage/` (dossiers et fichiers générés listés dans `.gitignore`). Voir [`docs/tests/coverage/README.md`](docs/tests/coverage/README.md). Aucune connexion Internet n’est nécessaire pour les produire : lancer `pytest` après installation locale des dépendances.
@@ -191,7 +229,12 @@ Les seuils et options sont définis dans `pyproject.toml` (`fail_under`, `cov-fa
 3. Exécuter les quality gates ci-dessus (ou `make quality` si disponible).
 4. Proposer une pull request avec une description claire du comportement et du périmètre.
 
-Les demandes de fonctionnalités et les anomalies peuvent être suivies via les issues du dépôt.
+Les demandes de fonctionnalités et les anomalies peuvent être suivies via les [issues GitHub](https://github.com/baobabgit/baobab-barcode/issues).
+
+## Liens utiles
+
+- Dépôt : [github.com/baobabgit/baobab-barcode](https://github.com/baobabgit/baobab-barcode)
+- Journal de développement : [`docs/dev_diary.md`](docs/dev_diary.md)
 
 ## Licence
 

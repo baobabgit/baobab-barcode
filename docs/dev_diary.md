@@ -1,5 +1,25 @@
 # Journal de développement
 
+## 2025-03-22 21:00:00 UTC
+
+### Feature : 10_public_facade_and_examples
+
+### Modifications
+
+- Module `baobab_barcode.api.barcode_api` : `validate_payload`, `generate`, `decode_from_bytes`, `decode_from_file` avec services par défaut (chargement paresseux des registres infrastructure), signatures typées sans exposer les détails d’infrastructure dans les paramètres.
+- Réexport sur le package racine et sous-package `api` ; README restructuré (description, installation, façade, exemples, architecture, développement, contribution, licence) ; dossier `examples/` avec script minimal.
+- Tests : façade, exports, round-trip end-to-end via l’API publique.
+
+### Buts
+
+- Offrir un point d’entrée stable pour la majorité des usages sans renoncer aux couches internes pour les intégrations avancées.
+
+### Impact
+
+- Les utilisateurs peuvent démarrer avec `import baobab_barcode` et quelques appels de fonctions documentés.
+
+---
+
 ## 2025-03-22 20:45:00 UTC
 
 ### Feature : 09_decode_backend_integration

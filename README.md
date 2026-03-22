@@ -79,6 +79,36 @@ result = svc.validate_payload("  HELLO  ", domain.BarcodeFormat.CODE128)
 assert result.success and result.normalized_payload == "HELLO"
 ```
 
+## Architecture — génération
+
+La génération suit une séparation **port / adaptateurs** :
+
+1. **`application.BarcodeGenerator`** (`Protocol`) : contrat implémenté par les backends (rendu PNG, SVG, etc. dans la couche infrastructure).
+2. **`application.BarcodeGeneratorRegistry`** : associe chaque `BarcodeFormat` à une implémentation du port (enregistrement explicite, extensible).
+3. **`application.BarcodeGenerationService`** : valide la charge via `PayloadValidationService`, résout le bon générateur, appelle `generate(payload_normalisé, options)` et retourne un `GeneratedBarcode`.
+
+En cas de charge invalide après validation, **`InvalidBarcodeValueException`** est levée ; si aucun backend n’est enregistré pour le format, **`UnsupportedBarcodeFormatException`**.
+
+```python
+from baobab_barcode import application, domain
+
+def make_stub():
+    class Stub:
+        def generate(self, payload, options):
+            return domain.GeneratedBarcode(
+                payload=payload,
+                barcode_format=options.barcode_format,
+                content=b"stub",
+                mime_type="image/png",
+                file_extension="png",
+            )
+    return Stub()
+
+svc = application.BarcodeGenerationService(
+    generators_by_format={domain.BarcodeFormat.CODE128: make_stub()},
+)
+```
+
 ## Development
 
 - Python 3.11 ou supérieur

@@ -24,13 +24,32 @@ import baobab_barcode
 print(baobab_barcode.__version__)
 ```
 
+## Modèles de domaine
+
+Les types publics du domaine sont exposés via `baobab_barcode.domain` (également réexporté comme attribut `domain` du package racine) :
+
+```python
+from baobab_barcode import domain
+
+fmt = domain.BarcodeFormat.CODE128
+opts = domain.BarcodeGenerationOptions(
+    barcode_format=fmt,
+    width=200,
+    height=80,
+    image_format="png",
+    include_text=True,
+)
+```
+
+Voir aussi `CHANGELOG.md` pour le détail des ajouts récents.
+
 ## Development
 
 - Python 3.11 ou supérieur
 - Installation éditable : `pip install -e ".[dev]"`
-- Tests : `pytest`
+- Tests avec couverture : `pytest` (seuil minimal 90 % sur `src/baobab_barcode`)
 - Formatage : `black .`
-- Lint : `pylint src tests`
+- Lint : `pylint src tests` et `flake8 src tests`
 - Types : `mypy`
 - Sécurité : `bandit -c pyproject.toml -r src`
 

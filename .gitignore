@@ -268,7 +268,9 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# Unit test / coverage reports (rapports projet sous docs/tests/coverage)
+docs/tests/coverage/html/
+docs/tests/coverage/coverage.xml
 htmlcov/
 .tox/
 .nox/

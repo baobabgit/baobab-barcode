@@ -48,6 +48,8 @@ pythonpath = ["src", "."]
 addopts = [
     "--cov=baobab_barcode",
     "--cov-report=term-missing",
+    "--cov-report=html:docs/tests/coverage/html",
+    "--cov-report=xml:docs/tests/coverage/coverage.xml",
     "--cov-fail-under=90",
 ]
 
@@ -59,6 +61,13 @@ source = ["src/baobab_barcode"]
 fail_under = 90
 show_missing = true
 skip_empty = true
+precision = 2
+
+[tool.coverage.html]
+directory = "docs/tests/coverage/html"
+
+[tool.coverage.xml]
+output = "docs/tests/coverage/coverage.xml"
 
 [tool.flake8]
 max-line-length = 100

@@ -1,4 +1,4 @@
-"""Adaptateurs et intégrations techniques."""
+"""Backends de génération (infrastructure)."""
 
 from baobab_barcode.infrastructure.generation.code128_png_barcode_generator import (
     Code128PngBarcodeGenerator,

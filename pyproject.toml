@@ -12,6 +12,11 @@ requires-python = ">=3.11"
 authors = [{ name = "Baobab Barcode contributors" }]
 keywords = ["barcode", "code128", "qrcode"]
 
+dependencies = [
+    "pillow>=10.0.0,<12.0.0",
+    "python-barcode>=0.15.1,<0.17.0",
+]
+
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0,<9.0.0",
@@ -64,6 +69,10 @@ strict = true
 explicit_package_bases = true
 mypy_path = "src"
 files = ["src/baobab_barcode", "tests"]
+
+[[tool.mypy.overrides]]
+module = "barcode.*"
+ignore_missing_imports = true
 
 [tool.pylint.main]
 fail-under = 9.0

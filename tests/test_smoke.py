@@ -1,7 +1,7 @@
 """Test minimal d'import du package."""
 
 import baobab_barcode
-from baobab_barcode import domain, exceptions
+from baobab_barcode import application, domain, exceptions
 
 
 class TestSmokeImport:
@@ -36,3 +36,12 @@ class TestExceptionsPublicExports:
         assert exceptions.BarcodeRenderingException is not None
         assert exceptions.BarcodeDecodingException is not None
         assert exceptions.BarcodeValidationException is not None
+
+
+class TestApplicationPublicExports:
+    """Réexport du sous-package ``application``."""
+
+    def test_application_package_exports(self) -> None:
+        """Les services applicatifs exposés sont importables."""
+        assert application.PayloadValidationService is not None
+        assert application.PayloadNormalizationService is not None

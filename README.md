@@ -58,6 +58,27 @@ except exceptions.BaobabBarcodeException as exc:
 
 Les messages par défaut sont exposés sur chaque classe via l'attribut de classe `DEFAULT_MESSAGE`.
 
+## Validation des charges utiles
+
+Le service `baobab_barcode.application.PayloadValidationService` expose `validate_payload(payload, barcode_format)` et retourne un `domain.ValidationResult` (succès / échec explicite, sans exception pour les cas courants).
+
+Règles minimales actuelles :
+
+| Format   | Non vide (après trim) | Bordures | Contenu |
+|----------|------------------------|----------|---------|
+| `CODE128` | obligatoire            | espaces de bord supprimés (`str.strip`) | uniquement caractères **ASCII imprimables** (U+0020 à U+007E) |
+| `QR_CODE` | obligatoire            | idem     | **Unicode** autorisé (tout point de code après trim) |
+
+Un format connu de l’enum mais absent du registre interne du service est signalé par un `ValidationResult` d’échec avec message explicite (aucune exception levée).
+
+```python
+from baobab_barcode import application, domain
+
+svc = application.PayloadValidationService()
+result = svc.validate_payload("  HELLO  ", domain.BarcodeFormat.CODE128)
+assert result.success and result.normalized_payload == "HELLO"
+```
+
 ## Development
 
 - Python 3.11 ou supérieur

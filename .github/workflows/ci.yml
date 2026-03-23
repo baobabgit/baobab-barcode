@@ -1,11 +1,13 @@
-# Qualité continue : aligné sur pyproject.toml, Makefile (quality) et README (quality gates).
+# Qualité release : aligné sur pyproject.toml, Makefile (quality) et README (quality gates).
+# Déclenché uniquement par push d’un tag de version (préfixe v, ex. v0.1.0).
 # Pas de publication PyPI (workflow séparé si besoin).
 
 name: CI
 
 on:
   push:
-  pull_request:
+    tags:
+      - "v*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

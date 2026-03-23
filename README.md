@@ -221,7 +221,7 @@ enchaîne formatage (vérification), Flake8, Pylint, Mypy, Bandit et Pytest.
 
 Avant une fusion ou une publication, la branche doit respecter au minimum :
 
-Le dépôt inclut un workflow GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) qui installe le projet avec `pip install -e ".[dev]"`, exécute `python -m pytest`, les contrôles ci-dessous dans l’ordre indiqué dans le workflow, puis `python -m build`, sur une matrice **Python 3.11 / 3.12 / 3.13** (Ubuntu). Sur le runner Linux, le paquet **`libzbar0`** est installé pour les tests *pyzbar* ; en local, adaptez les prérequis système à votre OS si besoin.
+Le dépôt inclut un workflow GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) qui **ne s’exécute que lors du push d’un tag de version** dont le nom commence par `v` (ex. `v0.1.0`, aligné sur la version publiée). Il installe le projet avec `pip install -e ".[dev]"`, exécute `python -m pytest`, les contrôles ci-dessous dans l’ordre indiqué dans le workflow, puis `python -m build`, sur une matrice **Python 3.11 / 3.12 / 3.13** (Ubuntu). Sur le runner Linux, le paquet **`libzbar0`** est installé pour les tests *pyzbar* ; en local, adaptez les prérequis système à votre OS si besoin.
 
 | Outil | Rôle | Commande indicative |
 |-------|------|---------------------|

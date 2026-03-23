@@ -119,6 +119,11 @@ ignore_missing_imports = true
 module = "pyzbar.*"
 ignore_missing_imports = true
 
+# Réexportations de la façade via ``__all__`` (aligné sur ``_public_api.STABLE_ROOT_EXPORTS``).
+[[tool.mypy.overrides]]
+module = "baobab_barcode"
+implicit_reexport = true
+
 [tool.pylint.main]
 fail-under = 9.0
 jobs = 0

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import baobab_barcode
 from baobab_barcode import api as api_subpackage
+from baobab_barcode._public_api import STABLE_ROOT_EXPORTS
 
 
 class TestPublicFacadeExports:
@@ -25,11 +26,5 @@ class TestPublicFacadeExports:
         assert api_subpackage.generate is baobab_barcode.generate
 
     def test_all_includes_facade_names_only(self) -> None:
-        """``__all__`` du package racine se limite à la façade stable."""
-        assert baobab_barcode.__all__ == [
-            "__version__",
-            "generate",
-            "validate_payload",
-            "decode_from_bytes",
-            "decode_from_file",
-        ]
+        """``__all__`` du package racine se limite à la façade stable (contrat 1.x)."""
+        assert tuple(baobab_barcode.__all__) == STABLE_ROOT_EXPORTS

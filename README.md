@@ -18,6 +18,26 @@ Bibliothèque Python pour **valider**, **générer** et **décoder** des codes-b
 
 Les erreurs prévues héritent de `baobab_barcode.exceptions.BaobabBarcodeException` et peuvent être filtrées finement ou interceptées globalement.
 
+## Contrat public stable
+
+À partir de la version **1.0.0**, le projet applique [Semantic Versioning](https://semver.org/lang/fr/) sur une **façade documentée** :
+
+- **Package racine** : uniquement `__version__`, `validate_payload`, `generate`, `decode_from_bytes`, `decode_from_file` (voir `baobab_barcode.__all__`).
+- **Domaine** : les types exportés par `baobab_barcode.domain` (`BarcodeFormat`, options, résultats) pour composer les appels à la façade.
+- **Exceptions** : les classes exportées par `baobab_barcode.exceptions` (voir `exceptions.__all__`) pour intercepter les erreurs métier.
+
+Le détail des engagements, des limites et des exceptions standard (`FileNotFoundError`, etc.) est décrit dans [`docs/public_api_contract.md`](docs/public_api_contract.md).
+
+## Éléments internes non couverts par la garantie de stabilité
+
+Ne sont **pas** garantis stables au sens SemVer pour les versions 1.x (sauf mention explicite dans une release) :
+
+- L’organisation interne des modules `application` et `infrastructure`, les registres, les backends concrets (générateurs PNG, *pyzbar*, etc.).
+- Le sous-package `api` : il réexporte la façade pour convenance ; le contrat de référence reste le **package racine** et `__all__`.
+- Tout symbole privé (préfixe `_`) ou module interne tel que `baobab_barcode._public_api` (réservé aux tests / implémentation).
+
+Les intégrations avancées peuvent continuer à importer ces couches ; elles doivent anticiper des évolutions en **mineur** sans rupture annoncée sur la façade et les types du domaine listés dans le contrat.
+
 ## Installation
 
 ### Depuis PyPI (recommandé après publication)
@@ -60,7 +80,7 @@ Avec l’extra `[decode]`, le décodage par défaut repose sur **pyzbar**, qui s
 
 ## Utilisation rapide (façade publique)
 
-Le contrat stable du package racine est défini par `baobab_barcode.__all__` : `__version__` et les quatre fonctions ci-dessous. Les sous-packages (`api`, `domain`, `application`, `exceptions`, `infrastructure`) ne sont pas réexportés sur le namespace racine mais restent importables explicitement (par ex. `from baobab_barcode import domain`, `import baobab_barcode.api`).
+Le contrat stable du package racine est défini par `baobab_barcode.__all__` : `__version__` et les quatre fonctions ci-dessous (voir aussi [Contrat public stable](#contrat-public-stable) et [`docs/public_api_contract.md`](docs/public_api_contract.md)). Les sous-packages (`api`, `domain`, `application`, `exceptions`, `infrastructure`) ne sont pas réexportés sur le namespace racine mais restent importables explicitement (par ex. `from baobab_barcode import domain`, `import baobab_barcode.api`).
 
 | Symbole | Rôle |
 |---------|------|
@@ -147,6 +167,8 @@ opts = domain.BarcodeGenerationOptions(
 L’historique des versions et les changements notables sont décrits dans [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Erreurs
+
+Les classes d’exception exportées par `baobab_barcode.exceptions` (voir `exceptions.__all__`) font partie du **contrat public stable** pour la détection d’erreurs (types et hiérarchie sous `BaobabBarcodeException`) ; les textes de message peuvent être affinés en mineur ou patch. Voir [`docs/public_api_contract.md`](docs/public_api_contract.md#3-exceptions-publiques-baobab_barcodeexceptions).
 
 ```python
 from baobab_barcode import exceptions

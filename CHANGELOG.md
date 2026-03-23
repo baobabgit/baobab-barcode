@@ -9,6 +9,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ### Added
 
+- **Gouvernance release** : document `docs/versioning_policy.md` (SemVer appliquée, définition des breaking changes, règles mineur/patch, politique de compatibilité et gouvernance du changelog) pour cadrer la préparation de la 1.0.0.
 - **Support plateforme** : politique de support officielle documentée dans `README.md` (versions Python, OS validés, niveau de support du décodage) avec distinction entre API cœur et backend de décodage natif.
 - **Tests** : suite `tests/contract/` pour la non-régression du contrat public (exports, signatures, types de résultat, exceptions, décodage avec/sans backend, round-trip CODE128 et QR via la façade) en préparation de la 1.0.0.
 - **Contrat d’API publique** : document `docs/public_api_contract.md` (façade racine, types `domain`, exceptions exportées, périmètre SemVer 1.x) ; sections README « Contrat public stable » et « Éléments internes non couverts par la garantie de stabilité » ; module interne `baobab_barcode._public_api` avec `STABLE_ROOT_EXPORTS` comme référence unique de `baobab_barcode.__all__`.
@@ -16,6 +17,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ### Changed
 
+- **Contribution** : section README enrichie (stratégie de branches, règles de PR, procédure de review) pour aligner la gouvernance documentaire avec l’état réel du dépôt.
 - **CI** : ajout d’un job smoke multi-plateforme (Linux/macOS/Windows, Python 3.11) pour l’API cœur sans décodage natif, en complément du job Linux complet.
 - **CI** : le workflow ne se déclenche plus sur chaque push ou pull request, uniquement sur **push d’un tag de version** `v*` (ex. `v0.1.0`).
 - **Package racine** : `__all__` et chargement du `__init__` limités à `__version__` et aux quatre fonctions de façade (`generate`, `validate_payload`, `decode_from_bytes`, `decode_from_file`). Les sous-packages `api`, `application`, `domain`, `exceptions` et `infrastructure` ne sont plus importés à l’import du package racine ; ils restent accessibles par import explicite (`from baobab_barcode import domain`, `import baobab_barcode.api`, attributs de module après import du sous-package, etc.).

@@ -1,5 +1,25 @@
 # Journal de développement
 
+## 2026-03-23 18:00:00 UTC
+
+### Feature : 16_release_governance_and_docs
+
+### Modifications
+
+- `docs/versioning_policy.md` : politique de versioning/compatibilité (SemVer, breaking changes, évolutions mineur/patch, règles de release, gouvernance du changelog).
+- `README.md` : section « Versioning et politique de compatibilité » + contribution détaillée (stratégie de branches, règles de PR, procédure de review).
+- `CHANGELOG.md` : entrée `[Unreleased]` dédiée à la gouvernance de release 1.0.0.
+
+### Buts
+
+- Préparer une release **1.0.0** avec des règles explicites de compatibilité et d’évolution.
+
+### Impact
+
+- Les intégrateurs et contributeurs disposent d’un cadre clair, aligné sur la CI et les tests réellement en place.
+
+---
+
 ## 2026-03-23 16:00:00 UTC
 
 ### Feature : 15_platform_support_policy_and_ci

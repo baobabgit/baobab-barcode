@@ -28,6 +28,16 @@ Les erreurs prévues héritent de `baobab_barcode.exceptions.BaobabBarcodeExcept
 
 Le détail des engagements, des limites et des exceptions standard (`FileNotFoundError`, etc.) est décrit dans [`docs/public_api_contract.md`](docs/public_api_contract.md).
 
+## Versioning et politique de compatibilité
+
+La gouvernance de release est documentée dans [`docs/versioning_policy.md`](docs/versioning_policy.md).
+
+Principes clés:
+
+- **SemVer** appliqué au projet (MAJOR = rupture du contrat public stable).
+- La définition concrète d’une **breaking change** est alignée sur la façade racine, les types de retour documentés et les exceptions publiques.
+- La promesse de support plateforme/Python est limitée à ce qui est réellement démontré par la CI.
+
 ## Éléments internes non couverts par la garantie de stabilité
 
 Ne sont **pas** garantis stables au sens SemVer pour les versions 1.x (sauf mention explicite dans une release) :
@@ -295,10 +305,32 @@ Les seuils et options sont définis dans `pyproject.toml` (`fail_under`, `cov-fa
 
 ## Contribution
 
-1. Créer une branche à partir de `main`.
-2. Ajouter ou adapter des tests (`pytest`) et respecter la couverture minimale.
-3. Exécuter les quality gates ci-dessus (ou `make quality` si disponible).
-4. Proposer une pull request avec une description claire du comportement et du périmètre.
+### Stratégie de branches
+
+- La branche d’intégration est `main`.
+- Travailler sur une branche dédiée (`feature/*`, `fix/*`, `chore/*`, `ci/*`, `docs/*`) puis ouvrir une PR vers `main`.
+- Une branche de travail ne doit pas être poussée comme release : seules les versions taggées (`vX.Y.Z`) matérialisent une release.
+
+### Règles de pull request
+
+Avant ouverture de PR :
+
+1. Ajouter ou adapter des tests (`pytest`) et respecter la couverture minimale.
+2. Exécuter les quality gates ci-dessus (ou `make quality` si disponible).
+3. Vérifier que la documentation impactée est à jour (`README`, `CHANGELOG`, docs).
+
+Contenu attendu de la PR :
+
+- périmètre clair (ce qui change / ce qui ne change pas),
+- impact utilisateur/intégrateur,
+- validation effectuée (qualité/tests).
+
+### Procédure de review
+
+- Priorité aux risques de régression sur le **contrat public stable**.
+- Contrôler la cohérence entre code, tests de contrat et documentation.
+- Vérifier que la promesse de compatibilité reste réaliste vis-à-vis de la CI.
+- Ne merger que si les quality gates sont verts.
 
 Les demandes de fonctionnalités et les anomalies peuvent être suivies via les [issues GitHub](https://github.com/baobabgit/baobab-barcode/issues).
 

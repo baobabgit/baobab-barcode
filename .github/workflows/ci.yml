@@ -1,5 +1,5 @@
-# Qualité release : aligné sur pyproject.toml, Makefile (quality) et README (quality gates).
-# Déclenché uniquement par push d’un tag de version (préfixe v, ex. v0.1.0).
+# Qualité release : aligné sur pyproject.toml, Makefile (quality) et README.
+# Déclenché uniquement par push d’un tag de version (préfixe v, ex. v1.0.0).
 # Pas de publication PyPI (workflow séparé si besoin).
 
 name: CI
@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
+  quality-linux-full:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -60,3 +60,32 @@ jobs:
 
       - name: Build package (wheel + sdist)
         run: python -m build
+
+  core-api-smoke-multiplatform:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        python-version: ["3.11"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install project (editable, no decode extra)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pytest
+
+      - name: Run core public contract smoke tests
+        run: |
+          python -m pytest -q -o addopts="" tests/contract/test_root_import_contract.py tests/contract/test_facade_signatures_contract.py tests/contract/test_result_types_contract.py tests/contract/test_documented_exceptions_contract.py

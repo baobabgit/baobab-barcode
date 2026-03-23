@@ -1,5 +1,29 @@
 # Journal de développement
 
+## 2026-03-23 12:00:00 UTC
+
+### Feature : 13_api_stability_contract
+
+### Modifications
+
+- `docs/public_api_contract.md` : contrat SemVer 1.x (façade racine, `domain`, `exceptions`, hors périmètre `application` / `infrastructure`, exceptions standard).
+- `README.md` : sections « Contrat public stable », « Éléments internes non couverts… », liens vers le contrat ; précisions sur les exceptions exportées.
+- `src/baobab_barcode/_public_api.py` : tuple `STABLE_ROOT_EXPORTS` (référence unique pour `__all__`).
+- `src/baobab_barcode/__init__.py` : docstring et `__all__` alignés sur `STABLE_ROOT_EXPORTS`.
+- `pyproject.toml` : override Mypy `implicit_reexport` pour le package racine (réexportations de façade).
+- `tests/baobab_barcode/api/test_public_facade_exports.py` : assertion contre `STABLE_ROOT_EXPORTS`.
+- `CHANGELOG.md` : entrée `[Unreleased]` sur la formalisation du contrat.
+
+### Buts
+
+- Préparer explicitement une **1.0.0** avec un périmètre stable documenté sans changer le comportement de l’API.
+
+### Impact
+
+- Les intégrateurs savent quoi figer dans leurs imports ; les évolutions internes restent possibles sans casser la promesse sur la façade.
+
+---
+
 ## 2026-03-22 23:00:00 UTC
 
 ### Feature : 12_release_readiness

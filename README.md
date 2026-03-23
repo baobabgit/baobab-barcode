@@ -225,6 +225,10 @@ Les sorties sont créées sous `dist/` (à ne pas versionner). Vérifier une ins
 pip install dist/baobab_barcode-0.1.0-py3-none-any.whl
 ```
 
+### Tests de contrat public (non-régression)
+
+Le dossier [`tests/contract/`](tests/contract/) regroupe des tests de **non-régression** alignés sur [`docs/public_api_contract.md`](docs/public_api_contract.md) : exports du package racine, signatures de la façade, formes des résultats (`ValidationResult`, `GeneratedBarcode`, `DecodeResult`), exceptions documentées, décodage avec ou sans backend, round-trip CODE128 / QR Code via `import baobab_barcode` uniquement. Ils complètent les tests existants sous `tests/baobab_barcode/api/` sans dépendance réseau.
+
 ### Rapports de couverture
 
 Les rapports HTML et XML sont écrits sous `docs/tests/coverage/` (dossiers et fichiers générés listés dans `.gitignore`). Voir [`docs/tests/coverage/README.md`](docs/tests/coverage/README.md). Aucune connexion Internet n’est nécessaire pour les produire : lancer `pytest` après installation locale des dépendances.

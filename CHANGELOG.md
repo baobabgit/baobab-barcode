@@ -9,6 +9,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ### Added
 
+- **Tests** : suite `tests/contract/` pour la non-régression du contrat public (exports, signatures, types de résultat, exceptions, décodage avec/sans backend, round-trip CODE128 et QR via la façade) en préparation de la 1.0.0.
 - **Contrat d’API publique** : document `docs/public_api_contract.md` (façade racine, types `domain`, exceptions exportées, périmètre SemVer 1.x) ; sections README « Contrat public stable » et « Éléments internes non couverts par la garantie de stabilité » ; module interne `baobab_barcode._public_api` avec `STABLE_ROOT_EXPORTS` comme référence unique de `baobab_barcode.__all__`.
 - **CI** : workflow GitHub Actions `.github/workflows/ci.yml` — installation éditable avec `[dev]`, `pytest` avec seuils de couverture du projet, Black, Pylint, Mypy, Flake8, Bandit, build du paquet ; matrice Python 3.11 / 3.12 / 3.13 sur Ubuntu (`libzbar0` pour *pyzbar*).
 

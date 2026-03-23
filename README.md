@@ -78,6 +78,36 @@ L’extra de développement inclut **pyzbar** (comme l’extra `[decode]`) afin 
 
 Avec l’extra `[decode]`, le décodage par défaut repose sur **pyzbar**, qui s’appuie sur la bibliothèque native **zbar**. Sur votre plateforme, installez le paquet système ou binaire **zbar** attendu par pyzbar (voir la documentation de [pyzbar](https://github.com/NaturalHistoryMuseum/pyzbar)).
 
+## Support officiel
+
+Cette matrice décrit la promesse de support avant la 1.0.0, alignée sur la CI actuelle et les tests de contrat public.
+
+| Portée | Python | Linux | macOS | Windows |
+|---|---|---|---|---|
+| **API cœur** (`validate_payload`, `generate`, structures de résultat, exceptions publiques) | 3.11 / 3.12 / 3.13 | Validé | Validé (smoke CI en 3.11) | Validé (smoke CI en 3.11) |
+| **Décodage par défaut** (`decode_*` avec backend `pyzbar`/zbar) | 3.11 / 3.12 / 3.13 | **Validé officiellement** (CI complète) | Meilleur effort | Meilleur effort |
+
+Notes:
+
+- La CI exécute un job Linux complet (quality gates + build + décodage avec `libzbar0`) en matrice Python 3.11/3.12/3.13.
+- Un job smoke multi-plateforme (Linux/macOS/Windows, Python 3.11) vérifie l’API cœur sans dépendance native de décodage.
+- La promesse de support est volontairement conservatrice: mieux vaut une validation explicite et testée qu’un support théorique.
+
+## Pré-requis système pour le décodage
+
+Le décodage nécessite **deux niveaux** de dépendances:
+
+1. **Python** : installer l’extra `decode` (ou `dev`) pour obtenir `pyzbar`.
+2. **Système** : installer la bibliothèque native **zbar** attendue par pyzbar.
+
+Indications pratiques (à adapter selon votre distribution/version):
+
+- **Linux (validé officiellement)**: paquet `libzbar0` (Debian/Ubuntu) ou équivalent `zbar` selon la distribution.
+- **macOS (meilleur effort)**: installer `zbar` via le gestionnaire système (ex. Homebrew).
+- **Windows (meilleur effort)**: installer un runtime/binaire zbar compatible avec pyzbar.
+
+Sans backend disponible, la génération/validation restent opérationnelles; le décodage via la façade lève `UnsupportedBarcodeFormatException` (voir `docs/public_api_contract.md`).
+
 ## Utilisation rapide (façade publique)
 
 Le contrat stable du package racine est défini par `baobab_barcode.__all__` : `__version__` et les quatre fonctions ci-dessous (voir aussi [Contrat public stable](#contrat-public-stable) et [`docs/public_api_contract.md`](docs/public_api_contract.md)). Les sous-packages (`api`, `domain`, `application`, `exceptions`, `infrastructure`) ne sont pas réexportés sur le namespace racine mais restent importables explicitement (par ex. `from baobab_barcode import domain`, `import baobab_barcode.api`).
@@ -247,7 +277,10 @@ enchaîne formatage (vérification), Flake8, Pylint, Mypy, Bandit et Pytest.
 
 Avant une fusion ou une publication, la branche doit respecter au minimum :
 
-Le dépôt inclut un workflow GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) qui **ne s’exécute que lors du push d’un tag de version** dont le nom commence par `v` (ex. `v0.1.0`, aligné sur la version publiée). Il installe le projet avec `pip install -e ".[dev]"`, exécute `python -m pytest`, les contrôles ci-dessous dans l’ordre indiqué dans le workflow, puis `python -m build`, sur une matrice **Python 3.11 / 3.12 / 3.13** (Ubuntu). Sur le runner Linux, le paquet **`libzbar0`** est installé pour les tests *pyzbar* ; en local, adaptez les prérequis système à votre OS si besoin.
+Le dépôt inclut un workflow GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) qui **ne s’exécute que lors du push d’un tag de version** dont le nom commence par `v` (ex. `v0.1.0`, aligné sur la version publiée). Il comprend :
+
+- un job Linux complet (matrice Python **3.11 / 3.12 / 3.13**) avec `pip install -e ".[dev]"`, `python -m pytest`, les quality gates ci-dessous, `python -m build`, et installation de `libzbar0` pour le décodage *pyzbar* ;
+- un job smoke multi-plateforme (Linux/macOS/Windows, Python 3.11) pour l’API cœur sans dépendance native de décodage.
 
 | Outil | Rôle | Commande indicative |
 |-------|------|---------------------|

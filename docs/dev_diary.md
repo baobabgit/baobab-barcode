@@ -1,5 +1,24 @@
 # Journal de développement
 
+## 2026-03-23 14:00:00 UTC
+
+### Feature : 14_public_contract_regression_tests
+
+### Modifications
+
+- `tests/contract/` : tests de non-régression du contrat public stable (`__all__`, signatures façade, champs des dataclasses de résultat, exceptions `exceptions.__all__`, scénario sans décodeur, échec structuré avec décodeur, round-trip CODE128 / QR / fichier via `baobab_barcode` uniquement) ; `conftest.py` avec réinitialisation du cache du service de lecture pour les scénarios patchés.
+- `README.md` : sous-section « Tests de contrat public » ; `CHANGELOG.md` : entrée `[Unreleased]`.
+
+### Buts
+
+- Verrouiller le comportement public par des tests contractuels avant une version **1.0.0**.
+
+### Impact
+
+- Les régressions sur la façade documentée sont détectées par la suite de tests dédiée ; pas de dépendance réseau.
+
+---
+
 ## 2026-03-23 12:00:00 UTC
 
 ### Feature : 13_api_stability_contract

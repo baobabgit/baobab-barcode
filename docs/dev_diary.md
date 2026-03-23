@@ -1,5 +1,25 @@
 # Journal de développement
 
+## 2026-03-23 16:00:00 UTC
+
+### Feature : 15_platform_support_policy_and_ci
+
+### Modifications
+
+- `.github/workflows/ci.yml` : conservation du job Linux complet (quality gates, coverage, build, `libzbar0`, matrice Python 3.11/3.12/3.13) et ajout d’un job smoke multi-plateforme (`ubuntu-latest`, `macos-latest`, `windows-latest`) en Python 3.11 pour vérifier l’API cœur sans dépendance native de décodage.
+- `README.md` : nouvelles sections « Support officiel » et « Pré-requis système pour le décodage » avec une promesse explicite et réaliste (décodage validé officiellement sur Linux, meilleur effort sur macOS/Windows).
+- `CHANGELOG.md` : entrée `[Unreleased]` sur la politique de support plateforme/Python et l’alignement CI.
+
+### Buts
+
+- Rendre la promesse de support crédible avant la 1.0.0 en l’adossant à des vérifications CI explicites.
+
+### Impact
+
+- Les utilisateurs savent précisément ce qui est officiellement validé et ce qui relève du meilleur effort; la CI reste maintenable tout en couvrant davantage de contextes d’exécution.
+
+---
+
 ## 2026-03-23 14:00:00 UTC
 
 ### Feature : 14_public_contract_regression_tests

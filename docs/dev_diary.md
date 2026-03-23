@@ -1,5 +1,26 @@
 # Journal de développement
 
+## 2026-03-23 19:00:00 UTC
+
+### Feature : 17_prepare_version_1_0_0
+
+### Modifications
+
+- `pyproject.toml` et `src/baobab_barcode/__init__.py` : version portée à `1.0.0`; classifier passé de Beta à Production/Stable.
+- `CHANGELOG.md` : fermeture de `[Unreleased]` et création de la section `[1.0.0]` avec un résumé explicite de la promesse de stabilité et de la gouvernance de release.
+- `README.md` : version affichée et exemples de tag/artefact alignés sur `1.0.0`, ajout d’un lien vers la checklist de release.
+- `docs/release_checklist.md` : checklist opérationnelle (préparation, qualité, packaging, publication).
+
+### Buts
+
+- Finaliser la bascule vers une release stable **1.0.0** sans ajouter de fonctionnalités.
+
+### Impact
+
+- Alignement complet version/package/docs/changelog ; processus de release plus lisible et reproductible.
+
+---
+
 ## 2026-03-23 18:00:00 UTC
 
 ### Feature : 16_release_governance_and_docs

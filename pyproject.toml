@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "baobab-barcode"
-version = "0.1.0"
+version = "1.0.0"
 description = "Bibliothèque Python pour la génération et la lecture de codes-barres."
 readme = "README.md"
 license = "MIT"
@@ -13,7 +13,7 @@ requires-python = ">=3.11"
 authors = [{ name = "Baobab Barcode contributors" }]
 keywords = ["barcode", "code128", "qrcode"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",

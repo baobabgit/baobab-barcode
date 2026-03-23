@@ -1,4 +1,4 @@
-# Politique de versioning et de compatibilité (objectif 1.0.0)
+# Politique de versioning et de compatibilité
 
 Ce document formalise la gouvernance de release du projet `baobab-barcode` et complète :
 
@@ -11,8 +11,8 @@ Ce document formalise la gouvernance de release du projet `baobab-barcode` et co
 Le projet suit [Semantic Versioning](https://semver.org/lang/fr/) :
 
 - **MAJOR** (`X.0.0`) : changements incompatibles avec le contrat public stable.
-- **MINOR** (`0.Y.0` ou `1.Y.0`) : ajout compatible (nouvelle capacité sans casser l’existant).
-- **PATCH** (`0.0.Z` ou `1.0.Z`) : correction de bug/documentation sans modification incompatible.
+- **MINOR** (`1.Y.0`) : ajout compatible (nouvelle capacité sans casser l’existant).
+- **PATCH** (`1.0.Z`) : correction de bug/documentation sans modification incompatible.
 
 ## 2) Ce qui constitue une breaking change
 

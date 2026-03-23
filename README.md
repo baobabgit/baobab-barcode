@@ -6,7 +6,7 @@ Bibliothèque Python pour **valider**, **générer** et **décoder** des codes-b
 |---|---|
 | **Paquet PyPI** | [`baobab-barcode`](https://pypi.org/project/baobab-barcode/) (après publication) |
 | **Import Python** | `baobab_barcode` |
-| **Version** | `0.1.0` (voir [`CHANGELOG.md`](CHANGELOG.md) et [SemVer](https://semver.org/lang/fr/)) |
+| **Version** | `1.0.0` (voir [`CHANGELOG.md`](CHANGELOG.md) et [SemVer](https://semver.org/lang/fr/)) |
 | **Python** | 3.11 ou supérieur |
 | **Licence** | MIT ([`LICENSE`](LICENSE)) |
 
@@ -90,7 +90,7 @@ Avec l’extra `[decode]`, le décodage par défaut repose sur **pyzbar**, qui s
 
 ## Support officiel
 
-Cette matrice décrit la promesse de support avant la 1.0.0, alignée sur la CI actuelle et les tests de contrat public.
+Cette matrice décrit la promesse de support officielle depuis la 1.0.0, alignée sur la CI actuelle et les tests de contrat public.
 
 | Portée | Python | Linux | macOS | Windows |
 |---|---|---|---|---|
@@ -262,7 +262,7 @@ python -m build
 Les sorties sont créées sous `dist/` (à ne pas versionner). Vérifier une installation propre dans un environnement virtuel :
 
 ```bash
-pip install dist/baobab_barcode-0.1.0-py3-none-any.whl
+pip install dist/baobab_barcode-1.0.0-py3-none-any.whl
 ```
 
 ### Tests de contrat public (non-régression)
@@ -287,7 +287,7 @@ enchaîne formatage (vérification), Flake8, Pylint, Mypy, Bandit et Pytest.
 
 Avant une fusion ou une publication, la branche doit respecter au minimum :
 
-Le dépôt inclut un workflow GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) qui **ne s’exécute que lors du push d’un tag de version** dont le nom commence par `v` (ex. `v0.1.0`, aligné sur la version publiée). Il comprend :
+Le dépôt inclut un workflow GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) qui **ne s’exécute que lors du push d’un tag de version** dont le nom commence par `v` (ex. `v1.0.0`, aligné sur la version publiée). Il comprend :
 
 - un job Linux complet (matrice Python **3.11 / 3.12 / 3.13**) avec `pip install -e ".[dev]"`, `python -m pytest`, les quality gates ci-dessous, `python -m build`, et installation de `libzbar0` pour le décodage *pyzbar* ;
 - un job smoke multi-plateforme (Linux/macOS/Windows, Python 3.11) pour l’API cœur sans dépendance native de décodage.
@@ -338,6 +338,7 @@ Les demandes de fonctionnalités et les anomalies peuvent être suivies via les 
 
 - Dépôt : [github.com/baobabgit/baobab-barcode](https://github.com/baobabgit/baobab-barcode)
 - Journal de développement : [`docs/dev_diary.md`](docs/dev_diary.md)
+- Checklist de release : [`docs/release_checklist.md`](docs/release_checklist.md)
 
 ## Licence
 

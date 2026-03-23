@@ -1,4 +1,4 @@
-# Contrat d’API publique stable (préparation 1.0.0)
+# Contrat d’API publique stable
 
 Ce document fixe ce qui est **garanti stable** sous [Semantic Versioning](https://semver.org/lang/fr/) à partir d’une version **1.0.0** du paquet `baobab-barcode`, et ce qui reste **hors garantie** ou **évolutif**.
 

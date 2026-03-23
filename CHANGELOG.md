@@ -7,21 +7,22 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-03-23
+
 ### Added
 
-- **Gouvernance release** : document `docs/versioning_policy.md` (SemVer appliquée, définition des breaking changes, règles mineur/patch, politique de compatibilité et gouvernance du changelog) pour cadrer la préparation de la 1.0.0.
+- **Gouvernance release** : documents `docs/versioning_policy.md` et `docs/release_checklist.md` (SemVer appliquée, définition des breaking changes, règles mineur/patch, procédure de release et de validation).
 - **Support plateforme** : politique de support officielle documentée dans `README.md` (versions Python, OS validés, niveau de support du décodage) avec distinction entre API cœur et backend de décodage natif.
-- **Tests** : suite `tests/contract/` pour la non-régression du contrat public (exports, signatures, types de résultat, exceptions, décodage avec/sans backend, round-trip CODE128 et QR via la façade) en préparation de la 1.0.0.
-- **Contrat d’API publique** : document `docs/public_api_contract.md` (façade racine, types `domain`, exceptions exportées, périmètre SemVer 1.x) ; sections README « Contrat public stable » et « Éléments internes non couverts par la garantie de stabilité » ; module interne `baobab_barcode._public_api` avec `STABLE_ROOT_EXPORTS` comme référence unique de `baobab_barcode.__all__`.
-- **CI** : workflow GitHub Actions `.github/workflows/ci.yml` — installation éditable avec `[dev]`, `pytest` avec seuils de couverture du projet, Black, Pylint, Mypy, Flake8, Bandit, build du paquet ; matrice Python 3.11 / 3.12 / 3.13 sur Ubuntu (`libzbar0` pour *pyzbar*).
+- **Tests de contrat** : suite `tests/contract/` pour la non-régression du contrat public (exports, signatures, types de résultat, exceptions, décodage avec/sans backend, round-trip CODE128 et QR via la façade).
+- **Contrat d’API publique** : document `docs/public_api_contract.md` ; module interne `baobab_barcode._public_api` avec `STABLE_ROOT_EXPORTS` comme référence unique de `baobab_barcode.__all__`.
+- **CI** : workflow GitHub Actions avec job Linux complet (quality gates + build + décodage natif) et job smoke multi-plateforme (Linux/macOS/Windows) pour l’API cœur.
 
 ### Changed
 
-- **Contribution** : section README enrichie (stratégie de branches, règles de PR, procédure de review) pour aligner la gouvernance documentaire avec l’état réel du dépôt.
-- **CI** : ajout d’un job smoke multi-plateforme (Linux/macOS/Windows, Python 3.11) pour l’API cœur sans décodage natif, en complément du job Linux complet.
-- **CI** : le workflow ne se déclenche plus sur chaque push ou pull request, uniquement sur **push d’un tag de version** `v*` (ex. `v0.1.0`).
-- **Package racine** : `__all__` et chargement du `__init__` limités à `__version__` et aux quatre fonctions de façade (`generate`, `validate_payload`, `decode_from_bytes`, `decode_from_file`). Les sous-packages `api`, `application`, `domain`, `exceptions` et `infrastructure` ne sont plus importés à l’import du package racine ; ils restent accessibles par import explicite (`from baobab_barcode import domain`, `import baobab_barcode.api`, attributs de module après import du sous-package, etc.).
-- **Décodage** : *pyzbar* n’est plus une dépendance obligatoire ; l’extra optionnel `[decode]` l’installe. Sans cet extra, le registre de lecture par défaut est vide et la façade lève `UnsupportedBarcodeFormatException` pour le décodage (message orientant vers `[decode]` et zbar système) ; `PngZbarBarcodeReader.decode_from_bytes` renvoie un échec structuré si *pyzbar* est absent. Export de `is_decode_backend_available` sur le sous-package `infrastructure` (et `infrastructure.reading`). L’extra `[dev]` inclut *pyzbar* pour les tests et le développement local.
+- **Statut du package** : version `1.0.0` et classifier `Development Status :: 5 - Production/Stable`.
+- **Promesse de stabilité (1.x)** : surface publique racine figée à `__version__`, `generate`, `validate_payload`, `decode_from_bytes`, `decode_from_file`; types `domain` et exceptions `exceptions.__all__` couverts par la politique de compatibilité.
+- **Contribution** : README enrichi (stratégie de branches, règles de PR, procédure de review) et gouvernance documentaire alignée avec l’état réel du dépôt.
+- **Décodage optionnel** : *pyzbar* reste optionnel via `[decode]`; sans backend disponible, le décodage façade échoue explicitement avec `UnsupportedBarcodeFormatException` pendant que génération/validation restent disponibles.
 
 ## [0.1.0] — 2026-03-22
 
@@ -45,3 +46,4 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 - Génération QR : clarification des heuristiques de taille et de redimensionnement (suppression de branches impossibles).
 
 [0.1.0]: https://github.com/baobabgit/baobab-barcode/releases/tag/v0.1.0
+[1.0.0]: https://github.com/baobabgit/baobab-barcode/releases/tag/v1.0.0
